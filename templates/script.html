@@ -2,5 +2,33 @@
     function newThread(){
         $('.modal').modal('open');
     }
-    document.getElementById("edit-fab").addEventListener("click",newThread)
+    $("#edit-fab").click(newThread);
+
+    $('#submitThreadButton').click(function () {
+        $("#submitThreadButton").addClass("disabled")
+        var formObject = {}
+        var formArray = $("#getthread").serializeArray();
+        $.each(formArray, function (i, item) {
+            formObject[item.name] = item.value;
+        });
+        $.ajax({
+            url: "/api/thread/" + formObject['thread'],
+            type: "POST",
+            contentType: "application/json; charset=utf-8",
+            data: JSON.stringify(formObject),
+            dataType: "json",
+            success: function (data) {
+                console.log(data)
+                console.log(data.data)
+                $('#leftDiv').remove();
+                $('#rightDiv').remove();
+                $('#getThreadCard').remove();
+                for (var i in data.data) {
+                    thread = JSON.parse(data.data[i])
+                    $('#mainContainerRow').append("<div class=\"col l12 s12 card-panel white\" id=\"thread-"+i['thread']+"\"><i class=\"small material-icons\">account_box</i>"+thread['username']+"<i class=\"small material-icons\">access_time</i>"+thread['time']+"<div class=\"content\" id=\"content-"+thread['thread']+"\">"+thread['content']+"</div>"+"</div>");
+                }
+            },
+            error: function(e) {}
+        })
+    })
 </script>
