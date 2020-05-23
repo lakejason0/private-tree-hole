@@ -1,4 +1,5 @@
-from flask import Flask, render_template
+from flask import Flask, render_template, request
+import json
 app = Flask(__name__)
 
 @app.route('/')
@@ -8,6 +9,7 @@ def index():
     return render_template("default.html")
 
 @app.route('/thread/<id>')
+@app.route('/thread/<id>.html')
 def thread(id):
     return ""
 
@@ -20,6 +22,18 @@ def public():
 @app.route('/login.html')
 def logging():
     return ""
+
+@app.route('/api')
+def api():
+    recv_data = json.loads(request.get_data('data'))
+
+@app.route('/api/thread/', method=['POST'])
+def thread():
+    recv_data = json.loads(request.get_data('data'))
+
+@app.route('/api/thread/<id>', method=['GET'])
+def getThread(id):
+    recv_data = json.loads(request.get_data('data'))
 
 if __name__ == '__main__':
     app.run(debug = True)
