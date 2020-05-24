@@ -10,7 +10,7 @@ import pymysql
 app = Flask(__name__)
 
 USERNAME = 'treehole'
-PASSWORD = '*******'
+PASSWORD = 'rDbNGdnyasnPjdkb'
 HOST = 'lakejason0.ml'
 PORT = 3306
 DATABASE = 'treehole'
@@ -98,7 +98,7 @@ def knownThread(id):
         posts = session.query(Post).filter((Post.thread==id) and (Post.is_deleted==0)).all()
         postslist = []
     for i in posts:
-        postslist.append(i.to_json())
+        postslist.append(json.loads(i.to_json()))
 #    print(postslist)
     return {'code':200,'data':postslist}
 if __name__ == '__main__':

@@ -4,7 +4,7 @@
     }
     $("#edit-fab").click(newThread);
 
-    $('#submitThreadButton').click(function () {
+    function submitThread(){
         $("#submitThreadButton").addClass("disabled")
         var formObject = {}
         var formArray = $("#getthread").serializeArray();
@@ -23,12 +23,48 @@
                 $('#leftDiv').remove();
                 $('#rightDiv').remove();
                 $('#getThreadCard').remove();
+                $('#mainContainerRow').append(`<div class="waves-effect waves-teal btn-flat" id="backToIndex"><i class="small material-icons">chevron_left</i><span>返回</span></div>`)
+                $('#backToIndex').click(function (){
+                    $('#mainContainerRow').empty();
+                    $('#mainContainerRow').append(`<div class="col l3" id="leftDiv"></div>
+                    <div class="col s12 l6" id="getThreadCard">
+                      <div class="card-panel white">
+                        <form id="getthread">
+                          <div class="input-field">
+                            <input id="thread" name="thread" type="text" class="validate">
+                            <label for="thread">讨论串号</label>
+                          </div>
+                          <input type="hidden" name="action" value="get">
+                          <button class="btn waves-effect waves-light" id="submitThreadButton" type="button">前往
+                            <i class="material-icons right">send</i>
+                          </button>
+                        </form>
+                      </div>
+                    </div>
+                    <div class="col l3" id="rightDiv"></div>`)
+                    $('#submitThreadButton').click(submitThread);
+                    history.pushState({}, "index", "/");
+                })
                 for (var i in data.data) {
-                    thread = JSON.parse(data.data[i])
-                    $('#mainContainerRow').append("<div class=\"col l12 s12 card-panel white\" id=\"thread-"+i['thread']+"\"><i class=\"small material-icons\">account_box</i>"+thread['username']+"<i class=\"small material-icons\">access_time</i>"+thread['time']+"<div class=\"content\" id=\"content-"+thread['thread']+"\">"+thread['content']+"</div>"+"</div>");
+                    thread = data.data[i]
+                    $('#mainContainerRow').append(`<div class="col l12 s12 card-panel white thread-card" id="thread-${thread['thread']}">
+                        <div class="card-content">
+                            <div class="content" id="content-${thread['thread']}">${thread['content']}</div>
+                            <div class="thread-metadata">
+                                <span class="grey-text username"><i class="tiny material-icons">account_box</i>${thread['username']}</span>
+                                <span class="grey-text time"><i class="tiny material-icons">access_time</i>${thread['time']}</span>
+                            </div>
+                        </div>
+                    </div>`);
                 }
+                history.pushState({}, "index", "/thread/"+thread['thread']);
             },
-            error: function(e) {}
-        })
-    })
+            error: function(e) {
+                console.log(e)
+                M.toast({html: `${e['status']} - ${e['statusText']}`})
+                $("#submitThreadButton").removeClass("disabled")
+            }
+        });
+    }
+    $('#submitThreadButton').click(submitThread)
 </script>
