@@ -1,0 +1,59 @@
+<main>
+    <div class="container" id="container">
+        <div class="row" id="mainContainerRow">
+          <div id="threadForm" class="invisible">
+          <div class="col l3" id="leftDiv"></div>
+          <div class="col s12 l6" id="getThreadCard">
+            <div class="card-panel white">
+              <form id="getthread">
+                <div class="input-field">
+                  <input id="threadInputField" name="thread" type="text" class="validate">
+                  <label for="thread">讨论串号</label>
+                </div>
+                <input type="hidden" name="action" value="get">
+                <button class="btn waves-effect waves-light" id="submitThreadButton" type="button">前往
+                  <i class="material-icons right">send</i>
+                </button>
+              </form>
+            </div>
+          </div>
+          <div class="col l3" id="rightDiv"></div>
+          </div>
+          <div id="threadContainer">
+            <div class="waves-effect waves-grey btn-flat" id="backToIndex"><i class="small material-icons">chevron_left</i><span>返回</span></div>
+            <h1 id="thread-title">{{thread['title']}}</h1>
+            {% for post in posts %}
+            <div class="col l12 s12 card-panel white thread-card" id="post-{{post['floor']}}">
+                <div class="card-content">
+                    <div class="content" id="content-{{post['floor']}}">{{post['content']}}</div>
+                    <div class="post-metadata">
+                        <span class="grey-text username"><i class="tiny material-icons">account_box</i>{{post['username']}}</span>
+                        <span class="grey-text time"><i class="tiny material-icons">access_time</i>{{post['time']}}</span>
+                    </div>
+                    <div class="floor">
+                        <span class="floor-number grey-text">{{post['floor']}}</span>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+          </div>
+        </div>
+        <div id="modal1" class="modal">
+          <div class="modal-content">
+            <h4>新建讨论串</h4>
+            <form>
+    
+            </form>
+          </div>
+          <div class="modal-footer">
+            <a href="#!" class="modal-close waves-effect waves-green btn-flat">关闭</a>
+          </div>
+        </div>
+        <div class="fixed-action-btn" id="edit-fab">
+            <a class="btn-floating btn-large red">
+              <i class="large material-icons">mode_edit</i>
+            </a>
+        </div>
+        <script>$(document).ready(function(){$('.fixed-action-btn').floatingActionButton();$('.modal').modal();});</script>
+    </div>
+    </main>

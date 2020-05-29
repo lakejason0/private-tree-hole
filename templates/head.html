@@ -37,10 +37,24 @@
             margin-bottom: 1em;
         }
 
-        .thread-metadata {
+        .post-metadata {
             position: absolute;
             left: auto;
             bottom: 5px;
+        }
+
+        .floor {
+            position: absolute;
+            right: 10px;
+            bottom: 5px;
+        }
+
+        .floor-number::before {
+            content: '#';
+        }
+        
+        .invisible {
+            display: none;
         }
     </style>
 </head>

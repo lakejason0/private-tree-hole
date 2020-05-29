@@ -1,6 +1,6 @@
 from flask import Flask, render_template, request, jsonify
 from flask_sqlalchemy import SQLAlchemy
-from sqlalchemy import Column, String, Boolean, Integer, TIMESTAMP, DATETIME, DATE, DECIMAL, Text, create_engine
+from sqlalchemy import Column, String, Boolean, Integer, TIMESTAMP, DATETIME, Date, DECIMAL, Text, create_engine
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy.ext.declarative import declarative_base
 from datetime import datetime
@@ -48,7 +48,6 @@ class Post(Base):
 
     def to_json(self):
         json_data = {
-            'id': self.id,
             'username': self.username,
             'thread': self.thread,
             'time': self.time,
@@ -56,6 +55,26 @@ class Post(Base):
             'is_deleted': self.is_deleted,
             'report': self.report,
             'content': self.content
+        }
+        return json.dumps(json_data,cls=DateEncoder)
+
+class Thread(Base):
+    __tablename__ = 'thread'
+
+    id = Column(Integer, primary_key=True, autoincrement=True)
+    thread = Column(String(30),nullable=False)
+    is_closed = Column(Boolean,nullable=False)
+    is_deleted = Column(Boolean,nullable=False)
+    is_announcement = Column(Boolean,nullable=False)
+    title = Column(Text,nullable=False)
+
+    def to_json(self):
+        json_data = {
+            'thread': self.thread,
+            'is_closed': self.is_closed,
+            'is_deleted': self.is_deleted,
+            'is_announcement': self.is_announcement,
+            'title': self.title
         }
         return json.dumps(json_data,cls=DateEncoder)
 
@@ -68,7 +87,20 @@ def index():
 @app.route('/thread/<id>')
 @app.route('/thread/<id>.html')
 def thread(id):
-    return ""
+    try:
+        session = DBSession()
+        posts = session.query(Post).filter((Post.thread==id) and (Post.is_deleted==0)).all()
+        postslist = []
+        for i in posts:
+            postslist.append(json.loads(i.to_json()))
+        thread = json.loads(session.query(Thread).filter((Thread.thread==id) and (Thread.is_deleted==0)).first().to_json())
+        if postslist or thread:
+            #    print(postslist)
+            return render_template("threadview.html",thread=thread,posts=postslist)
+        else:
+            return render_template("errorview.html")
+    except:
+        return render_template("errorview.html")
 
 @app.route('/public')
 @app.route('/public.html')
@@ -93,13 +125,20 @@ def unknownThread():
 @app.route('/api/thread/<id>', methods=['GET','POST'])
 def knownThread(id):
     recv_data = json.loads(request.get_data('data'))
-    if recv_data['action'] == "get":
-        session = DBSession()
-        posts = session.query(Post).filter((Post.thread==id) and (Post.is_deleted==0)).all()
-        postslist = []
-    for i in posts:
-        postslist.append(json.loads(i.to_json()))
-#    print(postslist)
-    return {'code':200,'data':postslist}
+    try:
+        if recv_data['action'] == "get":
+            session = DBSession()
+            posts = session.query(Post).filter((Post.thread==id) and (Post.is_deleted==0)).all()
+            postslist = []
+            for i in posts:
+                postslist.append(json.loads(i.to_json()))
+            thread = json.loads(session.query(Thread).filter((Thread.thread==id) and (Thread.is_deleted==0)).first().to_json())
+            if postslist or thread:
+                #    print(postslist)
+                return {'code':200,'data':{"thread":thread,"posts":postslist}}
+            else:
+                return {'code':403,'data':{'message':'Forbidden'}}
+    except:
+        return {'code':403,'data':{'message':'Forbidden'}}
 if __name__ == '__main__':
     app.run(debug = True)

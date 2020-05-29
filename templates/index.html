@@ -1,12 +1,13 @@
 <main>
 <div class="container" id="container">
     <div class="row" id="mainContainerRow">
+      <div id="threadForm">
       <div class="col l3" id="leftDiv"></div>
       <div class="col s12 l6" id="getThreadCard">
         <div class="card-panel white">
           <form id="getthread">
             <div class="input-field">
-              <input id="thread" name="thread" type="text" class="validate">
+              <input id="threadInputField" name="thread" type="text" class="validate">
               <label for="thread">讨论串号</label>
             </div>
             <input type="hidden" name="action" value="get">
@@ -17,6 +18,8 @@
         </div>
       </div>
       <div class="col l3" id="rightDiv"></div>
+      </div>
+      <div id="threadContainer"></div>
     </div>
     <div id="modal1" class="modal">
       <div class="modal-content">

@@ -1,9 +1,10 @@
 from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
-from sqlalchemy import Column, String, Boolean, Integer, Time, create_engine
+from sqlalchemy import Column, String, Boolean, Integer, TIMESTAMP, DATETIME, DATE, DECIMAL, Text, create_engine
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy.ext.declarative import declarative_base
 import pymysql
+import json
 
 app = Flask(__name__)
 
@@ -21,16 +22,50 @@ db = SQLAlchemy(app)
 
 Base = declarative_base(engine)
 
+class DateEncoder(json.JSONEncoder):
+    def default(self,obj):
+        if isinstance(obj, datetime):
+            return str(obj)
+        elif isinstance(obj,date):
+            return str(obj)
+        elif isinstance(obj,DECIMAL):
+            return str(obj)
+        else:
+            return json.JSONEncoder.default(self,obj)
+
 class Post(Base):
     __tablename__ = 'post'
 
     id = Column(Integer, primary_key=True, autoincrement=True)
     username = Column(String(25),nullable=False)
     thread = Column(String(30),nullable=False)
-    time = Column(Time,nullable=False)
+    time = Column(TIMESTAMP,nullable=False)
     floor = Column(Integer,nullable=False)
     is_deleted = Column(Boolean,nullable=False)
     report = Column(Integer,nullable=True)
+    content = Column(Text,nullable=False)
+
+    def to_json(self):
+        json_data = {
+            'username': self.username,
+            'thread': self.thread,
+            'time': self.time,
+            'floor': self.floor,
+            'is_deleted': self.is_deleted,
+            'report': self.report,
+            'content': self.content
+        }
+        return json.dumps(json_data,cls=DateEncoder)
+
+class Thread(Base):
+    __tablename__ = 'thread'
+
+    id = Column(Integer, primary_key=True, autoincrement=True)
+    thread = Column(String(30),nullable=False)
+    is_closed = Column(Boolean,nullable=False)
+    is_deleted = Column(Boolean,nullable=False)
+    is_announcement = Column(Boolean,nullable=False)
+    title = Column(Text,nullable=False)
 
 Base.metadata.create_all(engine)
 
