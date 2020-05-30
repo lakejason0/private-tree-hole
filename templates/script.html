@@ -23,9 +23,11 @@
             success: function(data) {
                 console.log(data)
                 if (data['code'] === 200){
-                    window.location = "/thread/" + data.data['thread']
                     $('.modal').modal('close');
                     $("#newThreadForm")[0].reset();
+                    $("#threadInputField").val(data.data.thread)
+                    submitThread()
+                    $("#threadInputField").val("")
                 } else {
                     M.toast({html: `${data['code']} - ${data.data['message']}`})
                     $("#newThreadModalProgress").remove();

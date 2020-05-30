@@ -3,7 +3,8 @@ from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy import Column, String, Boolean, Integer, TIMESTAMP, DATETIME, Date, DECIMAL, Text, create_engine
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy.ext.declarative import declarative_base
-from datetime import datetime
+from datetime import datetime, date
+from db_export import USERNAME, PASSWORD, HOST, PORT, DATABASE
 import json
 import pymysql
 import random
@@ -12,11 +13,6 @@ import string
 
 app = Flask(__name__)
 
-USERNAME = 'treehole'
-PASSWORD = 'rDbNGdnyasnPjdkb'
-HOST = 'lakejason0.ml'
-PORT = 3306
-DATABASE = 'treehole'
 DB_URI = 'mysql+pymysql://{}:{}@{}:{}/{}'.format(
     USERNAME, PASSWORD, HOST, PORT, DATABASE)
 engine = create_engine(DB_URI)
@@ -185,7 +181,7 @@ def unknownThread():
                         {'content': 'No description provided.'})
                 newThreadMetadata = Thread(thread=newThreadId, is_closed=False, is_deleted=False,
                                            is_announcement=False, title=recv_data['data']['title'])
-                newThread = Post(thread=newThread, username=recv_data['username'], time=recv_data['data']['time'],
+                newThread = Post(thread=newThreadId, username=recv_data['data']['username'], time=recv_data['data']['time'],
                                  floor=recv_data['data']['floor'], is_deleted=False, content=recv_data['data']['content'])
                 session.add(newThread)
                 session.add(newThreadMetadata)
@@ -196,7 +192,8 @@ def unknownThread():
                 return {'code': 500, 'data': {'message': 'Internal Server Error'}}
         elif recv_data['action'] == "query":
             pass
-    except:
+    except Exception as err:
+        print(err)
         return {'code': 500, 'data': {'message': 'Internal Server Error'}}
 
 
