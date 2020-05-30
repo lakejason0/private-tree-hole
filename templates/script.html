@@ -1,8 +1,45 @@
 <script>
-    function newThread(){
+    function newThreadModal(){
         $('.modal').modal('open');
     }
-    $("#edit-fab").click(newThread);
+
+    $("#edit-fab").click(newThreadModal);
+
+    function newThread(){
+        $("#newThreadModel").append(`<div class="progress" id="newThreadModalProgress">
+            <div class="indeterminate"></div>
+        </div>`)
+        var formObject = {}
+        var formArray = $("#newThreadForm").serializeArray();
+        $.each(formArray, function (i, item) {
+            formObject[item.name] = item.value;
+        });
+        $.ajax({
+            url: "/api/thread",
+            type: "POST",
+            contentType: "application/json; charset=utf-8",
+            data: JSON.stringify(formObject),
+            dataType: "json",
+            success: function(data) {
+                console.log(data)
+                if (data['code'] === 200){
+                    window.location = "/thread/" + data.data['thread']
+                    $('.modal').modal('close');
+                    $("#newThreadForm")[0].reset();
+                } else {
+                    M.toast({html: `${data['code']} - ${data.data['message']}`})
+                    $("#newThreadModalProgress").remove();
+                }
+            },
+            error: function(e) {
+                console.log(e)
+                M.toast({html: `${e['status']} - ${e['statusText']}`})
+                $("#newThreadModalProgress").remove();
+            }
+        });
+    }
+
+    $("#newThreadButton").click(newThread);
 
     function backToIndex(){
         $('#threadContainer').empty();
@@ -13,7 +50,7 @@
 
     function submitThread(){
         var formObject = {}
-        var formArray = $("#getthread").serializeArray();
+        var formArray = $("#getThreadForm").serializeArray();
         $.each(formArray, function (i, item) {
             formObject[item.name] = item.value;
         });
@@ -55,7 +92,7 @@
                     }
                     history.pushState({}, "index", "/thread/"+thread['thread']);
                 } else if (data['code'] === 403){
-                    M.toast({html: `403 - ${data.data['message']}`})
+                    M.toast({html: `${data['code']} - ${data.data['message']}`})
                     $("#submitThreadButton").removeClass("disabled")
                 }
             },

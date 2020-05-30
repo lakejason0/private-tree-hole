@@ -1,11 +1,26 @@
 <div id="modal1" class="modal">
-    <div class="modal-content">
+    <div class="modal-content" id="newThreadModal">
       <h4>新建讨论串</h4>
-      <form>
-
+      <form id="newThreadForm">
+        <div class="row">
+            <div class="input-field col s6">
+                <input name="username" type="text" class="validate">
+                <label for="first_name">用户名</label>
+            </div>
+            <div class="input-field col s6">
+                <input name="title" type="text" class="validate">
+                <label for="first_name">标题</label>
+            </div>
+            <div class="input-field col s12">
+                <textarea name="content" class="materialize-textarea"></textarea>
+                <label for="content">内容</label>
+            </div>
+            <input type="hidden" name="action" value="create">
+        </div>
       </form>
     </div>
     <div class="modal-footer">
-      <a href="#!" class="modal-close waves-effect waves-green btn-flat">关闭</a>
+      <a href="" id="newThreadButton" class="waves-effect waves-green btn-flat">提交</a>
+      <a href="" class="modal-close waves-effect waves-green btn-flat">关闭</a>
     </div>
 </div>
