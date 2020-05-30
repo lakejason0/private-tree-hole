@@ -158,15 +158,21 @@ def announcements():
 @app.route('/api/thread', methods=['POST'])
 def unknownThread():
     recv_data = json.loads(request.get_data('data'))
+    print(recv_data)
     try:
+        print(recv_data['action'])
         if recv_data['action'] == "create":
+            print(recv_data['action'])
             def rand_str(n): return ''.join([random.choice(
                 string.ascii_lowercase+string.ascii_uppercase+string.digits) for i in range(n)])
             newThreadId = rand_str(random.randint(6, 30))
+            print(newThreadId)
             session = DBSession()
             existingThreads = session.query(Thread).filter(
                 Thread.thread == newThreadId).all()
+            print(existingThreads)
             if not existingThreads:
+                print(recv_data['data'])
                 recv_data['data'].update(
                     {'time': time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())})
                 recv_data['data'].update({'floor': 1})

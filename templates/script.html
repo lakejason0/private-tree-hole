@@ -18,7 +18,7 @@
             url: "/api/thread",
             type: "POST",
             contentType: "application/json; charset=utf-8",
-            data: JSON.stringify(formObject),
+            data: JSON.stringify({"action":"create","data":formObject}),
             dataType: "json",
             success: function(data) {
                 console.log(data)
