@@ -30,7 +30,7 @@
                 console.log(data.data['code'])
                 if (data['code'] === 200){
                     $('#threadForm').addClass("invisible");
-                    $('#threadContainer').append(`<div class="waves-effect waves-grey btn-flat" id="backToIndex"><i class="small material-icons">chevron_left</i><span>返回</span></div>`)
+                    $('#threadContainer').append(`<div class="waves-effect waves-grey btn-flat" id="backToIndex"><i class="small material-icons">chevron_left</i></div>`)
                     $('#backToIndex').click(backToIndex);
                     thread = data.data['thread']
                     $('#threadContainer').append(`<h1 id="thread-title">${thread['title']}</h1>`)
@@ -41,8 +41,8 @@
                             <div class="card-content">
                                 <div class="content" id="content-${post['floor']}">${post['content']}</div>
                                 <div class="post-metadata">
-                                    <span class="grey-text username"><i class="tiny material-icons">account_box</i>${post['username']}</span>
-                                    <span class="grey-text time"><i class="tiny material-icons">access_time</i>${post['time']}</span>
+                                    <span class="grey-text username"><i class="tiny material-icons">account_box</i><span class="metadata-text">${post['username']}</span></span>
+                                    <span class="grey-text time"><i class="tiny material-icons">access_time</i><span class="metadata-text">${post['time']}</span></span>
                                 </div>
                                 <div class="floor">
                                     <span class="floor-number grey-text">${post['floor']}</span>

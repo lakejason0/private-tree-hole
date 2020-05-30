@@ -2,8 +2,7 @@
 <div class="container" id="container">
     <div class="row" id="mainContainerRow">
       <div id="threadForm">
-      <div class="col l3" id="leftDiv"></div>
-      <div class="col s12 l6" id="getThreadCard">
+      <div class="col s12 l6 offset-l3" id="getThreadCard">
         <div class="card-panel white">
           <form id="getthread">
             <div class="input-field">
@@ -17,26 +16,11 @@
           </form>
         </div>
       </div>
-      <div class="col l3" id="rightDiv"></div>
       </div>
       <div id="threadContainer"></div>
     </div>
-    <div id="modal1" class="modal">
-      <div class="modal-content">
-        <h4>新建讨论串</h4>
-        <form>
-
-        </form>
-      </div>
-      <div class="modal-footer">
-        <a href="#!" class="modal-close waves-effect waves-green btn-flat">关闭</a>
-      </div>
-    </div>
-    <div class="fixed-action-btn" id="edit-fab">
-        <a class="btn-floating btn-large red">
-          <i class="large material-icons">mode_edit</i>
-        </a>
-    </div>
+    {% include 'modal1.html' %}
+    {% include 'editFab.html' %}
     <script>$(document).ready(function(){$('.fixed-action-btn').floatingActionButton();$('.modal').modal();});</script>
 </div>
 </main>

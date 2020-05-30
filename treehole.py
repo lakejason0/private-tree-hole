@@ -96,21 +96,26 @@ def thread(id):
         thread = json.loads(session.query(Thread).filter((Thread.thread==id) and (Thread.is_deleted==0)).first().to_json())
         if postslist or thread:
             #    print(postslist)
-            return render_template("threadview.html",thread=thread,posts=postslist)
+            return render_template("threadView.html",thread=thread,posts=postslist)
         else:
-            return render_template("errorview.html")
+            return render_template("errorView.html")
     except:
-        return render_template("errorview.html")
+        return render_template("errorView.html")
 
 @app.route('/public')
 @app.route('/public.html')
 def public():
-    return ""
+    session = DBSession()
+    announcements = session.query(Thread).filter((Thread.is_announcement==1) and (Thread.is_deleted==0)).all()
+    announcementsList = []
+    for i in announcements:
+        announcementsList.append(json.loads(i.to_json()))
+    return render_template("announcementView.html",announcements=announcements)
 
 @app.route('/login')
 @app.route('/login.html')
 def logging():
-    return ""
+    return render_template("loginView.html")
 
 @app.route('/api')
 def api():
@@ -129,13 +134,13 @@ def knownThread(id):
         if recv_data['action'] == "get":
             session = DBSession()
             posts = session.query(Post).filter((Post.thread==id) and (Post.is_deleted==0)).all()
-            postslist = []
+            postsList = []
             for i in posts:
-                postslist.append(json.loads(i.to_json()))
+                postsList.append(json.loads(i.to_json()))
             thread = json.loads(session.query(Thread).filter((Thread.thread==id) and (Thread.is_deleted==0)).first().to_json())
-            if postslist or thread:
+            if postsList or thread:
                 #    print(postslist)
-                return {'code':200,'data':{"thread":thread,"posts":postslist}}
+                return {'code':200,'data':{"thread":thread,"posts":postsList}}
             else:
                 return {'code':403,'data':{'message':'Forbidden'}}
     except:

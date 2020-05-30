@@ -39,8 +39,25 @@
 
         .post-metadata {
             position: absolute;
-            left: auto;
+            left: 10px;
             bottom: 5px;
+        }
+
+        .post-metadata > span::before {
+            content: " • ";
+            vertical-align: text-bottom;
+        }
+
+        .post-metadata > span > .metadata-text {
+            vertical-align: text-bottom;
+        }
+
+        .post-metadata > span > .material-icons::after {
+            content: "\00A0";
+        }
+
+        .post-metadata > span:first-child::before {
+            display: none;
         }
 
         .floor {
@@ -52,7 +69,7 @@
         .floor-number::before {
             content: '#';
         }
-        
+
         .invisible {
             display: none;
         }
