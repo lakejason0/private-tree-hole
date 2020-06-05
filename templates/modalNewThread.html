@@ -1,0 +1,26 @@
+<div id="modalNewThread" class="modal">
+    <div class="modal-content" id="newThreadModal">
+      <h4 class="translate" data-identifier="newThread.formTitle">新建讨论串</h4>
+      <form id="newThreadForm" onsubmit="return false;">
+        <div class="row">
+            <div class="input-field col s6">
+                <input name="username" type="text" class="validate">
+                <label for="first_name" class="translate" data-identifier="newThread.username">用户名</label>
+            </div>
+            <div class="input-field col s6">
+                <input name="title" type="text" class="validate">
+                <label for="first_name" class="translate" data-identifier="newThread.threadTitle">标题</label>
+            </div>
+            <div class="input-field col s12">
+                <textarea name="content" class="materialize-textarea"></textarea>
+                <label for="content" class="translate" data-identifier="newThread.content">内容</label>
+            </div>
+            <input type="hidden" name="action" value="create">
+        </div>
+      </form>
+    </div>
+    <div class="modal-footer">
+      <a id="newThreadButton" class="waves-effect waves-green btn-flat translate" data-identifier="newThread.submit">提交</a>
+      <a class="modal-close waves-effect waves-green btn-flat translate" data-identifier="newThread.close">关闭</a>
+    </div>
+</div>

@@ -1,6 +1,6 @@
 <script>
     function newThreadModal(){
-        $('.modal').modal('open');
+        $('#modalNewThread').modal('open');
     }
 
     $("#edit-fab").click(newThreadModal);
@@ -29,7 +29,7 @@
                     submitThread()
                     $("#threadInputField").val("")
                 } else {
-                    M.toast({html: `${data['code']} - ${data.data['message']}`})
+                    M.toast({html: `${data['code']} - <span class="translate" data-identifier="${data.data['identifier']}">${data.data['message']}</span>`})
                     $("#newThreadModalProgress").remove();
                 }
             },
@@ -94,7 +94,7 @@
                     }
                     history.pushState({}, "index", "/thread/"+thread['thread']);
                 } else if (data['code'] === 403){
-                    M.toast({html: `${data['code']} - ${data.data['message']}`})
+                    M.toast({html: `${data['code']} - <span class="translate" data-identifier="${data.data['identifier']}">${data.data['message']}</span>`})
                     $("#submitThreadButton").removeClass("disabled")
                 }
             },

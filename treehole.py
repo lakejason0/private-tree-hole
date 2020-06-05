@@ -189,12 +189,12 @@ def unknownThread():
                 session.close()
                 return {'code': 200, 'data': {'thread': newThreadId}}
             else:
-                return {'code': 500, 'data': {'message': 'Internal Server Error'}}
+                return {'code': 500, 'data': {'message': 'Internal Server Error', 'identifier': 'message.ise'}}
         elif recv_data['action'] == "query":
             pass
     except Exception as err:
         print(err)
-        return {'code': 500, 'data': {'message': 'Internal Server Error'}}
+        return {'code': 500, 'data': {'message': 'Internal Server Error', 'identifier': 'message.ise'}}
 
 
 @app.route('/api/thread/<id>', methods=['GET', 'POST'])
@@ -218,7 +218,47 @@ def knownThread(id):
                 session.close()
                 return {'code': 403, 'data': {'message': 'Forbidden'}}
         elif recv_data['action'] == "reply":
-            pass
+            try:
+                session = DBSession()
+                thread = json.loads(session.query(Thread).filter(
+                    (Thread.thread == id) and (Thread.is_deleted == 0)).first().to_json())
+                if thread:
+                    print(recv_data['data'])
+                    recv_data['data'].update(
+                        {'time': time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())})
+                    if not recv_data['data']['username']:
+                        recv_data['data'].update({'username': 'Anonymous'})
+                    if not recv_data['data']['content']:
+                        recv_data['data'].update(
+                            {'content': 'No description provided.'})
+                    posts = session.query(Post).filter(Post.thread == id).all()
+                    postsList = []
+                    for i in posts:
+                        postsList.append(json.loads(i.to_json()))
+                    if postsList:
+                        floor = postsList[-1]['floor'] + 1
+                        recv_data['data'].update({'floor': floor})
+                    else:
+                        return {'code': 500, 'data': {'message': 'Can\'t find the correct floor number.', 'identifier': 'message.floorNumberError'}}
+                    reply = Post(thread=id, username=recv_data['data']['username'], time=recv_data['data']['time'],
+                                    floor=recv_data['data']['floor'], is_deleted=False, content=recv_data['data']['content'])
+                    session.add(reply)
+                    session.commit()
+                    posts = session.query(Post).filter(
+                        (Post.thread == id) and (Post.is_deleted == 0)).all()
+                    postsList = []
+                    for i in posts:
+                        postsList.append(json.loads(i.to_json()))
+                    thread = json.loads(session.query(Thread).filter(
+                        (Thread.thread == id) and (Thread.is_deleted == 0)).first().to_json())
+                    session.close()
+                    return {'code': 200, 'data': {"thread": thread, "posts": postsList}}
+                else:
+                    session.close()
+                    return {'code': 404, 'data': {'message': 'The thread you\'re replying to is missing.', 'identifier': 'message.missingThread'}}
+            except Exception as err:
+                print(err)
+                return {'code': 500, 'data': {'message': 'Internal Server Error', 'identifier': 'message.ise'}}
         elif recv_data['action'] == "delete":
             pass
         elif recv_data['action'] == "close":
@@ -230,7 +270,7 @@ def knownThread(id):
         elif recv_data['action'] == "depublicize":
             pass
     except:
-        return {'code': 403, 'data': {'message': 'Forbidden'}}
+        return {'code': 403, 'data': {'message': 'Forbidden', 'identifier': 'message.forbidden'}}
 
 
 if __name__ == '__main__':

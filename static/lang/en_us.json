@@ -1,0 +1,21 @@
+{
+    "message.ise": "Internal Server Error",
+    "message.floorNumberError": "Can't find the correct floor number.",
+    "message.missingThread": "The thread you're replying to is missing.",
+    "message.forbidden": "Permisson denied",
+    "newThread.formTitle": "New thread",
+    "newThread.username": "Username",
+    "newThread.threadTitle": "Title",
+    "newThread.content": "Content",
+    "newThread.submit": "Submit",
+    "newThread.close": "Close",
+    "thread.notFoundTitle": "The thread you requested is now missing.",
+    "navigation.home": "Home",
+    "navigation.public": "Public",
+    "navigation.login": "Login",
+    "navigation.sidebarName": "Private Tree Hole",
+    "public.title": "Announcement",
+    "login.formTitle": "Login",
+    "login.username": "Username",
+    "login.password": "Password"
+}

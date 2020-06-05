@@ -2,9 +2,9 @@
     <div class="container" id="mainContainerRow">
         <div class="col s12">
             <ul class="collection with-header">
-                <li class="collection-header"><h4>公告</h4></li>
+                <li class="collection-header translate" data-identifier="public.title"><h4>公告</h4></li>
                 {% for announcement in announcements %}
-                <li class="collection-item">{{announcement['title']}}<a href="/thread/{{announcement['thread']}}" class="secondary-content"><i class="material-icons">arrow_forward</i></a></div></li>
+                <li class="collection-item">{{announcement['title']}} ({{announcement['thread']}}) <a href="/thread/{{announcement['thread']}}" class="secondary-content"><i class="material-icons">arrow_forward</i></a></div></li>
                 {% endfor %}
             </ul>
         </div>

@@ -1,22 +1,7 @@
 <main>
     <div class="container" id="container">
         <div class="row" id="mainContainerRow">
-          <div id="threadForm" class="invisible">
-          <div class="col s12 l6 offset-l3" id="getThreadCard">
-            <div class="card-panel white">
-              <form id="getThreadForm">
-                <div class="input-field">
-                  <input id="threadInputField" name="thread" type="text" class="validate">
-                  <label for="thread">讨论串号</label>
-                </div>
-                <input type="hidden" name="action" value="get">
-                <button class="btn waves-effect waves-light" id="submitThreadButton" type="button">前往
-                  <i class="material-icons right">send</i>
-                </button>
-              </form>
-            </div>
-          </div>
-          </div>
+          {% include 'getThreadForm.html' %}
           <div id="threadContainer">
             <div class="waves-effect waves-grey btn-flat" id="backToIndex"><i class="small material-icons">chevron_left</i></div>
             <h1 id="thread-title">{{thread['title']}}</h1>
@@ -36,7 +21,7 @@
             {% endfor %}
           </div>
         </div>
-        {% include 'modal1.html' %}
+        {% include 'modalNewThread.html' %}
         {% include 'editFab.html' %}
         <script>$(document).ready(function(){$('.fixed-action-btn').floatingActionButton();$('.modal').modal();});</script>
     </div>

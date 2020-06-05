@@ -1,0 +1,21 @@
+{
+    "message.ise": "哎呀，土豆出现错误了",
+    "message.floorNumberError": "查询楼层号时出现错误",
+    "message.missingThread": "所回复的帖子不存在",
+    "message.forbidden": "没有权限",
+    "newThread.formTitle": "新建讨论串",
+    "newThread.username": "用户名",
+    "newThread.threadTitle": "标题",
+    "newThread.content": "内容",
+    "newThread.submit": "提交",
+    "newThread.close": "关闭",
+    "thread.notFoundTitle": "请求的内容不存在。",
+    "navigation.home": "主页",
+    "navigation.public": "公告",
+    "navigation.login": "登录",
+    "navigation.sidebarName": "双向树洞",
+    "public.title": "公告",
+    "login.formTitle": "登录",
+    "login.username": "用户名",
+    "login.password": "密码"
+}
