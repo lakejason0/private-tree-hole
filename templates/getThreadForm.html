@@ -1,13 +1,13 @@
-<div id="threadForm">
+<div id="threadFormContainer" class="{{getThreadFormVisible}}">
     <div class="col s12 l6 offset-l3" id="getThreadCard">
       <div class="card-panel white">
         <form id="getThreadForm">
           <div class="input-field">
             <input id="threadInputField" name="thread" type="text" class="validate">
-            <label for="thread">讨论串号</label>
+            <label for="thread" class="translate" data-identifier="getThreadForm.formTitle">讨论串号</label>
           </div>
           <input type="hidden" name="action" value="get">
-          <button class="btn waves-effect waves-light" id="submitThreadButton" type="button">前往
+          <button class="btn waves-effect waves-light" id="submitThreadButton" type="button"><span class="translate" data-identifier="getThreadForm.submit">前往</span>
             <i class="material-icons right">send</i>
           </button>
         </form>

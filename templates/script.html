@@ -43,9 +43,42 @@
 
     $("#newThreadButton").click(newThread);
 
+    function replyThread(){
+        var formObject = {}
+        var formArray = $("#replyForm").serializeArray();
+        $.each(formArray, function (i, item) {
+            formObject[item.name] = item.value;
+        });
+        $("#replyThreadButton").addClass("disabled");
+        $.ajax({
+            url: "/api/thread/", // need to plus the uid
+            type: "POST",
+            contentType: "application/json; charset=utf-8",
+            data: JSON.stringify({"action":"create","data":formObject}),
+            dataType: "json",
+            success: function(data) {
+                console.log(data)
+                if (data['code'] === 200){
+                    $("#replyForm")[0].reset();
+                    $("#replyThreadButton").removeClass("disabled");
+                } else {
+                    M.toast({html: `${data['code']} - <span class="translate" data-identifier="${data.data['identifier']}">${data.data['message']}</span>`})
+                    $("#replyThreadButton").removeClass("disabled");
+                }
+            },
+            error: function(e) {
+                console.log(e)
+                M.toast({html: `${e['status']} - ${e['statusText']}`})
+                $("#submitThreadButton").removeClass("disabled");
+            }
+        });
+    }
+
     function backToIndex(){
+        $('#replyFormContainer').addClass("invisible");
+        $('#threadClosedText').addClass("invisible");
         $('#threadContainer').empty();
-        $('#threadForm').removeClass("invisible");
+        $('#threadFormContainer').removeClass("invisible");
         $("#submitThreadButton").removeClass("disabled");
         history.pushState({}, "index", "/");
     }
@@ -68,9 +101,11 @@
                 console.log(data.data)
                 console.log(data.data['code'])
                 if (data['code'] === 200){
-                    $('#threadForm').addClass("invisible");
+                    $('#threadFormContainer').addClass("invisible");
                     $('#threadContainer').append(`<div class="waves-effect waves-grey btn-flat" id="backToIndex"><i class="small material-icons">chevron_left</i></div>`)
                     $('#backToIndex').click(backToIndex);
+                    $('#replyFormContainer').removeClass("invisible");
+                    $('#replyForm').removeClass("invisible");
                     thread = data.data['thread']
                     $('#threadContainer').append(`<h1 id="thread-title">${thread['title']}</h1>`)
                     for (var i in data.data['posts']) {
@@ -90,10 +125,11 @@
                         </div>`);
                     }
                     if (thread['is_closed']){
-                        
+                        $('#replyForm').addClass("invisible");
+                        $('#threadClosedText').removeClass("invisible");
                     }
                     history.pushState({}, "index", "/thread/"+thread['thread']);
-                } else if (data['code'] === 403){
+                } else {
                     M.toast({html: `${data['code']} - <span class="translate" data-identifier="${data.data['identifier']}">${data.data['message']}</span>`})
                     $("#submitThreadButton").removeClass("disabled")
                 }

@@ -3,6 +3,7 @@
     "message.floorNumberError": "Can't find the correct floor number.",
     "message.missingThread": "The thread you're replying to is missing.",
     "message.forbidden": "Permisson denied",
+    "message.closedThread": "The thread you're replying to is closed.",
     "newThread.formTitle": "New thread",
     "newThread.username": "Username",
     "newThread.threadTitle": "Title",
@@ -17,5 +18,11 @@
     "public.title": "Announcement",
     "login.formTitle": "Login",
     "login.username": "Username",
-    "login.password": "Password"
+    "login.password": "Password",
+    "getThreadForm.formTitle": "Thread UID",
+    "getThreadForm.submit": "Go",
+    "replyThread.username": "Username",
+    "replyThread.content": "Content",
+    "replyThreadForm.submit": "Reply",
+    "replyThread.closed": "The thread is closed."
 }

@@ -2,6 +2,7 @@
     "message.ise": "哎呀，土豆出现错误了",
     "message.floorNumberError": "查询楼层号时出现错误",
     "message.missingThread": "所回复的帖子不存在",
+    "message.closedThread": "所回复的帖子已被关闭",
     "message.forbidden": "没有权限",
     "newThread.formTitle": "新建讨论串",
     "newThread.username": "用户名",
@@ -17,5 +18,11 @@
     "public.title": "公告",
     "login.formTitle": "登录",
     "login.username": "用户名",
-    "login.password": "密码"
+    "login.password": "密码",
+    "getThreadForm.formTitle": "讨论串号",
+    "getThreadForm.submit": "前往",
+    "replyThread.username": "用户名",
+    "replyThread.content": "内容",
+    "replyThread.submit": "回复",
+    "replyThread.closed": "该帖子已被关闭。"
 }

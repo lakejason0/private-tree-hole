@@ -87,7 +87,7 @@ class Thread(Base):
 @app.route('/index')
 @app.route('/index.html')
 def index():
-    return render_template("default.html")
+    return render_template("default.html", getThreadFormVisible="", replyFormVisible="invisible")
 
 
 @app.route('/thread/<id>')
@@ -105,13 +105,13 @@ def thread(id):
         if postslist or thread:
             #    print(postslist)
             session.close()
-            return render_template("threadView.html", thread=thread, posts=postslist)
+            return render_template("threadView.html", thread=thread, posts=postslist, getThreadFormVisible="invisible", replyFormVisible="")
         else:
             session.close()
-            return render_template("errorView.html")
+            return render_template("errorView.html", getThreadFormVisible="invisible", replyFormVisible="")
     except:
         session.close()
-        return render_template("errorView.html")
+        return render_template("errorView.html", getThreadFormVisible="invisible", replyFormVisible="")
 
 
 @app.route('/public')
@@ -223,36 +223,40 @@ def knownThread(id):
                 thread = json.loads(session.query(Thread).filter(
                     (Thread.thread == id) and (Thread.is_deleted == 0)).first().to_json())
                 if thread:
-                    print(recv_data['data'])
-                    recv_data['data'].update(
-                        {'time': time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())})
-                    if not recv_data['data']['username']:
-                        recv_data['data'].update({'username': 'Anonymous'})
-                    if not recv_data['data']['content']:
+                    if not thread['is_closed']:
+                        print(recv_data['data'])
                         recv_data['data'].update(
-                            {'content': 'No description provided.'})
-                    posts = session.query(Post).filter(Post.thread == id).all()
-                    postsList = []
-                    for i in posts:
-                        postsList.append(json.loads(i.to_json()))
-                    if postsList:
-                        floor = postsList[-1]['floor'] + 1
-                        recv_data['data'].update({'floor': floor})
+                            {'time': time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())})
+                        if not recv_data['data']['username']:
+                            recv_data['data'].update({'username': 'Anonymous'})
+                        if not recv_data['data']['content']:
+                            recv_data['data'].update(
+                                {'content': 'No description provided.'})
+                        posts = session.query(Post).filter(Post.thread == id).all()
+                        postsList = []
+                        for i in posts:
+                            postsList.append(json.loads(i.to_json()))
+                        if postsList:
+                            floor = postsList[-1]['floor'] + 1
+                            recv_data['data'].update({'floor': floor})
+                        else:
+                            return {'code': 500, 'data': {'message': 'Can\'t find the correct floor number.', 'identifier': 'message.floorNumberError'}}
+                        reply = Post(thread=id, username=recv_data['data']['username'], time=recv_data['data']['time'],
+                                        floor=recv_data['data']['floor'], is_deleted=False, content=recv_data['data']['content'])
+                        session.add(reply)
+                        session.commit()
+                        posts = session.query(Post).filter(
+                            (Post.thread == id) and (Post.is_deleted == 0)).all()
+                        postsList = []
+                        for i in posts:
+                            postsList.append(json.loads(i.to_json()))
+                        thread = json.loads(session.query(Thread).filter(
+                            (Thread.thread == id) and (Thread.is_deleted == 0)).first().to_json())
+                        session.close()
+                        return {'code': 200, 'data': {"thread": thread, "posts": postsList}}
                     else:
-                        return {'code': 500, 'data': {'message': 'Can\'t find the correct floor number.', 'identifier': 'message.floorNumberError'}}
-                    reply = Post(thread=id, username=recv_data['data']['username'], time=recv_data['data']['time'],
-                                    floor=recv_data['data']['floor'], is_deleted=False, content=recv_data['data']['content'])
-                    session.add(reply)
-                    session.commit()
-                    posts = session.query(Post).filter(
-                        (Post.thread == id) and (Post.is_deleted == 0)).all()
-                    postsList = []
-                    for i in posts:
-                        postsList.append(json.loads(i.to_json()))
-                    thread = json.loads(session.query(Thread).filter(
-                        (Thread.thread == id) and (Thread.is_deleted == 0)).first().to_json())
-                    session.close()
-                    return {'code': 200, 'data': {"thread": thread, "posts": postsList}}
+                        session.close()
+                        return {'code': 403, 'data': {'message': 'The thread you\'re replying to is closed.', 'identifier': 'message.closedThread'}}
                 else:
                     session.close()
                     return {'code': 404, 'data': {'message': 'The thread you\'re replying to is missing.', 'identifier': 'message.missingThread'}}

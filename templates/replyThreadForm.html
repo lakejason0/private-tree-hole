@@ -1,0 +1,23 @@
+<div id="replyFormContainer" class="{{replyFormVisible}}">
+    <div class="col s12" id="replyThreadCard">
+        <div class="card-panel white">
+            <form id="replyForm">
+                <div class="row">
+                    <div class="input-field col s6">
+                        <input name="username" type="text" class="validate">
+                        <label for="username" class="translate" data-identifier="replyThread.username">用户名</label>
+                    </div>
+                    <div class="input-field col s12">
+                        <textarea name="content" class="materialize-textarea"></textarea>
+                        <label for="content" class="translate" data-identifier="replyThread.content">内容</label>
+                    </div>
+                    <input type="hidden" name="action" value="reply">
+                </div>
+                <button class="btn waves-effect waves-light" id="replyThreadButton" type="button"><span class="translate" data-identifier="replyThread.submit">回复</span>
+                    <i class="material-icons right">send</i>
+                </button>
+            </form>
+            <div class="translate invisible" id="threadClosedText" data-identifier="replyThread.closed">该帖子已被关闭。</div>
+        </div>
+    </div>
+</div>
