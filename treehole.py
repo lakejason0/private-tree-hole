@@ -10,6 +10,7 @@ import pymysql
 import random
 import time
 import string
+import os
 
 app = Flask(__name__)
 
@@ -82,17 +83,42 @@ class Thread(Base):
         }
         return json.dumps(json_data, cls=DateEncoder)
 
+lang_path = 'static/lang/'
+
+def getLangName(path):
+    ''' 获取指定目录下的所有指定后缀的文件名 '''
+    lang_list = []
+    f_list = os.listdir(path)
+    # print f_list
+    for i in f_list:
+        # os.path.splitext():分离文件名与扩展名
+        if os.path.splitext(i)[-1] == '.json':
+            lang_list.append(i)
+    return {'path': path, 'lang_list': lang_list}
+
+
+def loadLang(lang_list):
+    langs = {}
+    for i in lang_list['lang_list']:
+        with open(lang_list['path']+i, 'r', encoding='utf8') as f:
+            lang = json.load(f)
+            name = os.path.splitext(i)[0]
+            langs.update({name: lang})
+    return langs
+
 
 @app.route('/')
 @app.route('/index')
 @app.route('/index.html')
 def index():
-    return render_template("default.html", getThreadFormVisible="", replyFormVisible="invisible")
+    langs = json.dumps(loadLang(getLangName(lang_path)),ensure_ascii=False)
+    return render_template("default.html", thread={"thread": ""}, getThreadFormVisible="", replyFormVisible="invisible", langs=langs)
 
 
 @app.route('/thread/<id>')
 @app.route('/thread/<id>.html')
 def thread(id):
+    langs = json.dumps(loadLang(getLangName(lang_path)),ensure_ascii=False)
     try:
         session = DBSession()
         posts = session.query(Post).filter(
@@ -105,18 +131,19 @@ def thread(id):
         if postslist or thread:
             #    print(postslist)
             session.close()
-            return render_template("threadView.html", thread=thread, posts=postslist, getThreadFormVisible="invisible", replyFormVisible="")
+            return render_template("threadView.html", thread=thread, posts=postslist, getThreadFormVisible="invisible", replyFormVisible="", langs=langs)
         else:
             session.close()
-            return render_template("errorView.html", getThreadFormVisible="invisible", replyFormVisible="")
+            return render_template("errorView.html", getThreadFormVisible="invisible", replyFormVisible="", langs=langs)
     except:
         session.close()
-        return render_template("errorView.html", getThreadFormVisible="invisible", replyFormVisible="")
+        return render_template("errorView.html", getThreadFormVisible="invisible", replyFormVisible="", langs=langs)
 
 
 @app.route('/public')
 @app.route('/public.html')
 def public():
+    langs = json.dumps(loadLang(getLangName(lang_path)),ensure_ascii=False)
     session = DBSession()
     announcements = session.query(Thread).filter(
         (Thread.is_announcement == 1) and (Thread.is_deleted == 0)).all()
@@ -124,13 +151,14 @@ def public():
     for i in announcements:
         announcementsList.append(json.loads(i.to_json()))
     session.close()
-    return render_template("announcementView.html", announcements=announcements)
+    return render_template("announcementView.html", thread={"thread": ""}, announcements=announcements, langs=langs)
 
 
 @app.route('/login')
 @app.route('/login.html')
 def logging():
-    return render_template("loginView.html")
+    langs = json.dumps(loadLang(getLangName(lang_path)),ensure_ascii=False)
+    return render_template("loginView.html", thread={"thread": ""}, langs=langs)
 
 
 @app.route('/api')
@@ -172,6 +200,9 @@ def unknownThread():
                 recv_data['data'].update(
                     {'time': time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())})
                 recv_data['data'].update({'floor': 1})
+                if (not recv_data['data']['title']) and (not recv_data['data']['username']) and (not recv_data['data']['content']):
+                    session.close()
+                    return {'code': 400, 'data': {'message': 'Nothing is provided', 'identifier': 'message.emptyPost'}}
                 if not recv_data['data']['title']:
                     recv_data['data'].update({'title': 'Untitled'})
                 if not recv_data['data']['username']:
@@ -225,6 +256,9 @@ def knownThread(id):
                 if thread:
                     if not thread['is_closed']:
                         print(recv_data['data'])
+                        if (not recv_data['data']['username']) and (not recv_data['data']['content']):
+                            session.close()
+                            return {'code': 400, 'data': {'message': 'Nothing is provided', 'identifier': 'message.emptyPost'}}
                         recv_data['data'].update(
                             {'time': time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())})
                         if not recv_data['data']['username']:
@@ -232,7 +266,8 @@ def knownThread(id):
                         if not recv_data['data']['content']:
                             recv_data['data'].update(
                                 {'content': 'No description provided.'})
-                        posts = session.query(Post).filter(Post.thread == id).all()
+                        posts = session.query(Post).filter(
+                            Post.thread == id).all()
                         postsList = []
                         for i in posts:
                             postsList.append(json.loads(i.to_json()))
@@ -242,7 +277,7 @@ def knownThread(id):
                         else:
                             return {'code': 500, 'data': {'message': 'Can\'t find the correct floor number.', 'identifier': 'message.floorNumberError'}}
                         reply = Post(thread=id, username=recv_data['data']['username'], time=recv_data['data']['time'],
-                                        floor=recv_data['data']['floor'], is_deleted=False, content=recv_data['data']['content'])
+                                     floor=recv_data['data']['floor'], is_deleted=False, content=recv_data['data']['content'])
                         session.add(reply)
                         session.commit()
                         posts = session.query(Post).filter(

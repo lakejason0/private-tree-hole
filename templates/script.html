@@ -1,6 +1,17 @@
 <script>
 
-    var currentThreadId = "";
+    function htmlEscape(text){ 
+        return text.replace(/[<>"&]/g, function(match, pos, originalText){
+          switch(match){
+          case "<": return "&lt;"; 
+          case ">":return "&gt;";
+          case "&":return "&amp;"; 
+          case "\"":return "&quot;"; 
+        } 
+        }); 
+    }
+
+    var currentThreadId = "{% if thread['thread'] %}{{thread['thread']}}{% endif %}";
 
     function newThreadModal(){
         $('#modalNewThread').modal('open');
@@ -64,8 +75,36 @@
                 if (data['code'] === 200){
                     $("#replyForm")[0].reset();
                     $("#replyThreadButton").removeClass("disabled");
+                    $('#threadContainer').empty();
+                    $('#threadContainer').append(`<div class="waves-effect waves-grey btn-flat" id="backToIndex"><i class="small material-icons">chevron_left</i></div>`)
+                    $('#backToIndex').click(backToIndex);
+                    thread = data.data['thread']
+                    $('#threadContainer').append(`<h1 id="thread-title">${thread['title']}</h1>`)
+                    for (var i in data.data['posts']) {
+                        var post = data.data['posts'][i]
+                        post['content'] = htmlEscape(post['content']);
+                        console.log(post)
+                        $('#threadContainer').append(`<div class="col l12 s12 card-panel white thread-card" id="post-${post['floor']}">
+                            <div class="card-content">
+                                <div class="content" id="content-${post['floor']}">${post['content']}</div>
+                                <div class="post-metadata">
+                                    <span class="grey-text username"><i class="tiny material-icons">account_box</i><span class="metadata-text">${post['username']}</span></span>
+                                    <span class="grey-text time"><i class="tiny material-icons">access_time</i><span class="metadata-text">${post['time']}</span></span>
+                                </div>
+                                <div class="floor">
+                                    <span class="floor-number grey-text">${post['floor']}</span>
+                                </div>
+                            </div>
+                        </div>`);
+                    }
+                    if (thread['is_closed']){
+                        $('#replyForm').addClass("invisible");
+                        $('#threadClosedText').removeClass("invisible");
+                    }
+                    currentThreadId = thread['thread'];
+                    history.pushState({}, "index", "/thread/"+thread['thread']);
                 } else {
-                    M.toast({html: `${data['code']} - <span class="translate" data-identifier="${data.data['identifier']}">${data.data['message']}</span>`})
+                    M.toast({html: `<span>${data['code']}</span><span>&nbsp;-&nbsp;</span><span class="translate" data-identifier="${data.data['identifier']}">${data.data['message']}</span>`})
                     $("#replyThreadButton").removeClass("disabled");
                 }
             },
@@ -115,7 +154,8 @@
                     thread = data.data['thread']
                     $('#threadContainer').append(`<h1 id="thread-title">${thread['title']}</h1>`)
                     for (var i in data.data['posts']) {
-                        post = data.data['posts'][i]
+                        var post = data.data['posts'][i]
+                        post['content'] = htmlEscape(post['content']);
                         console.log(post)
                         $('#threadContainer').append(`<div class="col l12 s12 card-panel white thread-card" id="post-${post['floor']}">
                             <div class="card-content">
@@ -137,7 +177,7 @@
                     currentThreadId = thread['thread'];
                     history.pushState({}, "index", "/thread/"+thread['thread']);
                 } else {
-                    M.toast({html: `${data['code']} - <span class="translate" data-identifier="${data.data['identifier']}">${data.data['message']}</span>`})
+                    M.toast({html: `<span>${data['code']}</span><span>&nbsp;-&nbsp;</span><span class="translate" data-identifier="${data.data['identifier']}">${data.data['message']}</span>`})
                     $("#submitThreadButton").removeClass("disabled")
                 }
             },
@@ -150,4 +190,44 @@
     }
     $('#submitThreadButton').click(submitThread)
     $('#backToIndex').click(backToIndex)
+
+    var dict = {{ langs|safe }}
+
+    var language = "en_us" // 之后做语言选择
+
+    // 选择需要观察变动的节点
+    var targetNode = document.querySelector('body');
+
+    // 观察器的配置（需要观察什么变动）
+    var config = {
+        attributes: true, childList: true, subtree: false,characterData: false,
+    };
+
+    // 当观察到变动时执行的回调函数
+    var callback = function(mutations) {
+
+        for (var mutation of mutations) {
+            if (mutation.type == 'childList') {
+                console.log(mutation.addedNodes)
+                let filter = Array.from(mutation.addedNodes).filter(v => v.nodeType === Node.ELEMENT_NODE).filter(v => v.classList.contains("translate"))
+                if (filter.length >= 1) {
+                    console.log('need to translate', filter)
+                    filter.forEach(dom => {
+                        dom.innerText = dict[language][dom.getAttribute("data-identifier")]
+                    })
+                }
+            } else if (mutation.type == 'attributes') {
+                console.log('The ' + mutation.attributeName + ' attribute was modified.');
+            }
+        }
+    };
+
+    // 创建一个观察器实例并传入回调函数
+    var observer = new MutationObserver(callback);
+
+    // 以上述配置开始观察目标节点
+    observer.observe(targetNode, config);
+    const stop = () => {
+        observer.disconnect();
+    }
 </script>

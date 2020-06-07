@@ -4,6 +4,7 @@
     "message.missingThread": "The thread you're replying to is missing.",
     "message.forbidden": "Permisson denied",
     "message.closedThread": "The thread you're replying to is closed.",
+    "message.emptyPost": "You can't post an empty post.",
     "newThread.formTitle": "New thread",
     "newThread.username": "Username",
     "newThread.threadTitle": "Title",

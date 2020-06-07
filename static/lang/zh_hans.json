@@ -4,6 +4,7 @@
     "message.missingThread": "所回复的帖子不存在",
     "message.closedThread": "所回复的帖子已被关闭",
     "message.forbidden": "没有权限",
+    "message.emptyPost": "所提交的帖子不能是空的",
     "newThread.formTitle": "新建讨论串",
     "newThread.username": "用户名",
     "newThread.threadTitle": "标题",
