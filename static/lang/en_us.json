@@ -25,5 +25,9 @@
     "replyThread.username": "Username",
     "replyThread.content": "Content",
     "replyThread.submit": "Reply",
-    "replyThread.closed": "The thread is closed."
+    "replyThread.closed": "The thread is closed.",
+    "l10n.settings.title": "Localization settings",
+    "l10n.settings.selectLanguage": "Select a language",
+    "l10n.settings.submit": "Submit",
+    "l10n.settings.close": "Close"
 }

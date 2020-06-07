@@ -25,5 +25,9 @@
     "replyThread.username": "用户名",
     "replyThread.content": "内容",
     "replyThread.submit": "回复",
-    "replyThread.closed": "该帖子已被关闭。"
+    "replyThread.closed": "该帖子已被关闭。",
+    "l10n.settings.title": "语言设置",
+    "l10n.settings.selectLanguage": "选择语言",
+    "l10n.settings.submit": "提交",
+    "l10n.settings.close": "关闭"
 }

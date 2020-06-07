@@ -111,14 +111,14 @@ def loadLang(lang_list):
 @app.route('/index')
 @app.route('/index.html')
 def index():
-    langs = json.dumps(loadLang(getLangName(lang_path)),ensure_ascii=False)
+    langs = loadLang(getLangName(lang_path))
     return render_template("default.html", thread={"thread": ""}, getThreadFormVisible="", replyFormVisible="invisible", langs=langs)
 
 
 @app.route('/thread/<id>')
 @app.route('/thread/<id>.html')
 def thread(id):
-    langs = json.dumps(loadLang(getLangName(lang_path)),ensure_ascii=False)
+    langs = loadLang(getLangName(lang_path))
     try:
         session = DBSession()
         posts = session.query(Post).filter(
@@ -143,7 +143,7 @@ def thread(id):
 @app.route('/public')
 @app.route('/public.html')
 def public():
-    langs = json.dumps(loadLang(getLangName(lang_path)),ensure_ascii=False)
+    langs = loadLang(getLangName(lang_path))
     session = DBSession()
     announcements = session.query(Thread).filter(
         (Thread.is_announcement == 1) and (Thread.is_deleted == 0)).all()
@@ -157,7 +157,7 @@ def public():
 @app.route('/login')
 @app.route('/login.html')
 def logging():
-    langs = json.dumps(loadLang(getLangName(lang_path)),ensure_ascii=False)
+    langs = loadLang(getLangName(lang_path))
     return render_template("loginView.html", thread={"thread": ""}, langs=langs)
 
 

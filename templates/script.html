@@ -23,6 +23,12 @@
 
     $("#edit-fab").click(newThreadModal);
 
+    function l10nModal(){
+        $('#modalL10nSettings').modal('open');
+    }
+
+    $("#l10n-fab").click(l10nModal);
+
     function newThread() {
         $("#newThreadModel").append(`<div class="progress" id="newThreadModalProgress">
             <div class="indeterminate"></div>
