@@ -3,7 +3,7 @@
         <h4 class="translate" data-identifier="l10n.settings.title">语言设置</h4>
         <form id="l10nForm" onsubmit="return false;">
             <div class="input-field col s12">
-                <select>
+                <select name="language">
                 {% for lang in langs.keys() %}
                   <option value="{{lang}}">{{lang}}</option>
                 {% endfor %}
