@@ -1,25 +1,29 @@
 <script>
 
-    function htmlEscape(text){ 
-        return text.replace(/[<>"&]/g, function(match, pos, originalText){
-          switch(match){
-          case "<": return "&lt;"; 
-          case ">":return "&gt;";
-          case "&":return "&amp;"; 
-          case "\"":return "&quot;"; 
-        } 
-        }); 
+    function htmlEscape(text) {
+        return text.replace(/[<>"&]/g, function (match, pos, originalText) {
+            switch (match) {
+                case "<":
+                    return "&lt;";
+                case ">":
+                    return "&gt;";
+                case "&":
+                    return "&amp;";
+                case "\"":
+                    return "&quot;";
+            }
+        });
     }
 
     var currentThreadId = "{% if thread['thread'] %}{{thread['thread']}}{% endif %}";
 
-    function newThreadModal(){
+    function newThreadModal() {
         $('#modalNewThread').modal('open');
     }
 
     $("#edit-fab").click(newThreadModal);
 
-    function newThread(){
+    function newThread() {
         $("#newThreadModel").append(`<div class="progress" id="newThreadModalProgress">
             <div class="indeterminate"></div>
         </div>`)
@@ -32,11 +36,11 @@
             url: "/api/thread",
             type: "POST",
             contentType: "application/json; charset=utf-8",
-            data: JSON.stringify({"action":"create","data":formObject}),
+            data: JSON.stringify({"action": "create", "data": formObject}),
             dataType: "json",
-            success: function(data) {
+            success: function (data) {
                 console.log(data)
-                if (data['code'] === 200){
+                if (data['code'] === 200) {
                     $('.modal').modal('close');
                     $("#newThreadForm")[0].reset();
                     $("#threadInputField").val(data.data.thread)
@@ -47,7 +51,7 @@
                     $("#newThreadModalProgress").remove();
                 }
             },
-            error: function(e) {
+            error: function (e) {
                 console.log(e)
                 M.toast({html: `${e['status']} - ${e['statusText']}`})
                 $("#newThreadModalProgress").remove();
@@ -57,7 +61,7 @@
 
     $("#newThreadButton").click(newThread);
 
-    function replyThread(){
+    function replyThread() {
         var formObject = {}
         var formArray = $("#replyForm").serializeArray();
         $.each(formArray, function (i, item) {
@@ -68,11 +72,11 @@
             url: "/api/thread/" + currentThreadId,
             type: "POST",
             contentType: "application/json; charset=utf-8",
-            data: JSON.stringify({"action":"reply","data":formObject}),
+            data: JSON.stringify({"action": "reply", "data": formObject}),
             dataType: "json",
-            success: function(data) {
+            success: function (data) {
                 console.log(data)
-                if (data['code'] === 200){
+                if (data['code'] === 200) {
                     $("#replyForm")[0].reset();
                     $("#replyThreadButton").removeClass("disabled");
                     $('#threadContainer').empty();
@@ -97,18 +101,18 @@
                             </div>
                         </div>`);
                     }
-                    if (thread['is_closed']){
+                    if (thread['is_closed']) {
                         $('#replyForm').addClass("invisible");
                         $('#threadClosedText').removeClass("invisible");
                     }
                     currentThreadId = thread['thread'];
-                    history.pushState({}, "index", "/thread/"+thread['thread']);
+                    history.pushState({}, "index", "/thread/" + thread['thread']);
                 } else {
                     M.toast({html: `<span>${data['code']}</span><span>&nbsp;-&nbsp;</span><span class="translate" data-identifier="${data.data['identifier']}">${data.data['message']}</span>`})
                     $("#replyThreadButton").removeClass("disabled");
                 }
             },
-            error: function(e) {
+            error: function (e) {
                 console.log(e)
                 M.toast({html: `${e['status']} - ${e['statusText']}`})
                 $("#submitThreadButton").removeClass("disabled");
@@ -118,7 +122,7 @@
 
     $("#replyThreadButton").click(replyThread);
 
-    function backToIndex(){
+    function backToIndex() {
         $('#replyFormContainer').addClass("invisible");
         $('#threadClosedText').addClass("invisible");
         $('#threadContainer').empty();
@@ -128,7 +132,7 @@
         history.pushState({}, "index", "/");
     }
 
-    function submitThread(){
+    function submitThread() {
         var formObject = {}
         var formArray = $("#getThreadForm").serializeArray();
         $.each(formArray, function (i, item) {
@@ -145,7 +149,7 @@
                 console.log(data)
                 console.log(data.data)
                 console.log(data.data['code'])
-                if (data['code'] === 200){
+                if (data['code'] === 200) {
                     $('#threadFormContainer').addClass("invisible");
                     $('#threadContainer').append(`<div class="waves-effect waves-grey btn-flat" id="backToIndex"><i class="small material-icons">chevron_left</i></div>`)
                     $('#backToIndex').click(backToIndex);
@@ -170,28 +174,30 @@
                             </div>
                         </div>`);
                     }
-                    if (thread['is_closed']){
+                    if (thread['is_closed']) {
                         $('#replyForm').addClass("invisible");
                         $('#threadClosedText').removeClass("invisible");
                     }
                     currentThreadId = thread['thread'];
-                    history.pushState({}, "index", "/thread/"+thread['thread']);
+                    history.pushState({}, "index", "/thread/" + thread['thread']);
                 } else {
                     M.toast({html: `<span>${data['code']}</span><span>&nbsp;-&nbsp;</span><span class="translate" data-identifier="${data.data['identifier']}">${data.data['message']}</span>`})
                     $("#submitThreadButton").removeClass("disabled")
                 }
             },
-            error: function(e) {
+            error: function (e) {
                 console.log(e)
                 M.toast({html: `${e['status']} - ${e['statusText']}`})
                 $("#submitThreadButton").removeClass("disabled")
             }
         });
     }
+
     $('#submitThreadButton').click(submitThread)
     $('#backToIndex').click(backToIndex)
 
-    var dict = {{ langs|safe }}
+    var dict =
+    {{ langs|safe }}
 
     var language = "en_us" // 之后做语言选择
 
@@ -200,11 +206,18 @@
 
     // 观察器的配置（需要观察什么变动）
     var config = {
-        attributes: true, childList: true, subtree: false,characterData: false,
+        attributes: true, childList: true, subtree: false, characterData: false,
     };
 
+    function callTranslate(nodes) {
+        nodes.forEach(dom => {
+            dom.innerText = dict[language][dom.getAttribute("data-identifier")]
+        })
+    }
+
+    callTranslate(document.querySelectorAll(".translate"))
     // 当观察到变动时执行的回调函数
-    var callback = function(mutations) {
+    var callback = function (mutations) {
 
         for (var mutation of mutations) {
             if (mutation.type == 'childList') {
@@ -212,9 +225,7 @@
                 let filter = Array.from(mutation.addedNodes).filter(v => v.nodeType === Node.ELEMENT_NODE).filter(v => v.classList.contains("translate"))
                 if (filter.length >= 1) {
                     console.log('need to translate', filter)
-                    filter.forEach(dom => {
-                        dom.innerText = dict[language][dom.getAttribute("data-identifier")]
-                    })
+                    callTranslate(filter)
                 }
             } else if (mutation.type == 'attributes') {
                 console.log('The ' + mutation.attributeName + ' attribute was modified.');
