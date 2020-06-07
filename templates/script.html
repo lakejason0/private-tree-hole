@@ -211,7 +211,7 @@
 
     function callTranslate(nodes) {
         nodes.forEach(dom => {
-            dom.innerText = dict[language][dom.getAttribute("data-identifier")]
+            dom.innerText = dict[language][dom.getAttribute("data-identifier")] || "L10N ERROR"
         })
     }
 
