@@ -24,6 +24,6 @@
     "getThreadForm.submit": "Go",
     "replyThread.username": "Username",
     "replyThread.content": "Content",
-    "replyThreadForm.submit": "Reply",
+    "replyThread.submit": "Reply",
     "replyThread.closed": "The thread is closed."
 }
