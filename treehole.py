@@ -83,7 +83,9 @@ class Thread(Base):
         }
         return json.dumps(json_data, cls=DateEncoder)
 
+
 lang_path = 'static/lang/'
+
 
 def getLangName(path):
     ''' 获取指定目录下的所有指定后缀的文件名 '''
@@ -200,9 +202,10 @@ def unknownThread():
                 recv_data['data'].update(
                     {'time': time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())})
                 recv_data['data'].update({'floor': 1})
-                if (not recv_data['data']['title']) and (not recv_data['data']['username']) and (not recv_data['data']['content']):
+                if (not recv_data['data']['title']) and (not recv_data['data']['content']):
                     session.close()
-                    return {'code': 400, 'data': {'message': 'Nothing is provided', 'identifier': 'message.emptyPost'}}
+                    toastsList = [{'code': 400, 'message': 'Nothing is provided', 'identifier': 'message.emptyPost'}]
+                    return {'code': 400, 'data': {}, 'toast': toastsList}
                 if not recv_data['data']['title']:
                     recv_data['data'].update({'title': 'Untitled'})
                 if not recv_data['data']['username']:
@@ -220,12 +223,16 @@ def unknownThread():
                 session.close()
                 return {'code': 200, 'data': {'thread': newThreadId}}
             else:
-                return {'code': 500, 'data': {'message': 'Internal Server Error', 'identifier': 'message.ise'}}
+                toastsList = [
+                    {'code': 500, 'message': 'Internal Server Error', 'identifier': 'message.ise'}]
+                return {'code': 500, 'data': {}, 'toast': toastsList}
         elif recv_data['action'] == "query":
             pass
     except Exception as err:
         print(err)
-        return {'code': 500, 'data': {'message': 'Internal Server Error', 'identifier': 'message.ise'}}
+        toastsList = [
+            {'code': 500, 'message': 'Internal Server Error', 'identifier': 'message.ise'}]
+        return {'code': 500, 'data': {}, 'toast': toastsList}
 
 
 @app.route('/api/thread/<id>', methods=['GET', 'POST'])
@@ -247,7 +254,9 @@ def knownThread(id):
                 return {'code': 200, 'data': {"thread": thread, "posts": postsList}}
             else:
                 session.close()
-                return {'code': 403, 'data': {'message': 'Forbidden'}}
+                toastsList = [
+                    {'code': 403, 'message': 'Forbidden', 'identifier': 'message.forbidden'}]
+                return {'code': 403, 'data': {}, 'toast': toastsList}
         elif recv_data['action'] == "reply":
             try:
                 session = DBSession()
@@ -256,9 +265,11 @@ def knownThread(id):
                 if thread:
                     if not thread['is_closed']:
                         print(recv_data['data'])
-                        if (not recv_data['data']['username']) and (not recv_data['data']['content']):
+                        if not recv_data['data']['content']:
                             session.close()
-                            return {'code': 400, 'data': {'message': 'Nothing is provided', 'identifier': 'message.emptyPost'}}
+                            toastsList = [
+                                {'code': 400, 'message': 'Nothing is provided', 'identifier': 'message.emptyPost'}]
+                            return {'code': 400, 'data': {}, 'toast': toastsList}
                         recv_data['data'].update(
                             {'time': time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())})
                         if not recv_data['data']['username']:
@@ -275,7 +286,9 @@ def knownThread(id):
                             floor = postsList[-1]['floor'] + 1
                             recv_data['data'].update({'floor': floor})
                         else:
-                            return {'code': 500, 'data': {'message': 'Can\'t find the correct floor number.', 'identifier': 'message.floorNumberError'}}
+                            toastsList = [
+                                {'message': 'Can\'t find the correct floor number.', 'identifier': 'message.floorNumberError'}]
+                            return {'code': 500, 'data': {}, 'toast': toastsList}
                         reply = Post(thread=id, username=recv_data['data']['username'], time=recv_data['data']['time'],
                                      floor=recv_data['data']['floor'], is_deleted=False, content=recv_data['data']['content'])
                         session.add(reply)
@@ -291,13 +304,19 @@ def knownThread(id):
                         return {'code': 200, 'data': {"thread": thread, "posts": postsList}}
                     else:
                         session.close()
-                        return {'code': 403, 'data': {'message': 'The thread you\'re replying to is closed.', 'identifier': 'message.closedThread'}}
+                        toastsList = [
+                            {'code': 403, 'message': 'The thread you\'re replying to is closed.', 'identifier': 'message.closedThread'}]
+                        return {'code': 403, 'data': {}, 'toast': toastsList}
                 else:
                     session.close()
-                    return {'code': 404, 'data': {'message': 'The thread you\'re replying to is missing.', 'identifier': 'message.missingThread'}}
+                    toastsList = [
+                        {'code': 404, 'message': 'The thread you\'re replying to is missing.', 'identifier': 'message.missingThread'}]
+                    return {'code': 404, 'data': {}, 'toast': toastsList}
             except Exception as err:
                 print(err)
-                return {'code': 500, 'data': {'message': 'Internal Server Error', 'identifier': 'message.ise'}}
+                toastsList = [
+                    {'code': 500, 'message': 'Internal Server Error', 'identifier': 'message.ise'}]
+                return {'code': 500, 'data': {}, 'toast': toastsList}
         elif recv_data['action'] == "delete":
             pass
         elif recv_data['action'] == "close":
@@ -308,8 +327,11 @@ def knownThread(id):
             pass
         elif recv_data['action'] == "depublicize":
             pass
-    except:
-        return {'code': 403, 'data': {'message': 'Forbidden', 'identifier': 'message.forbidden'}}
+    except Exception as err:
+        print(err)
+        toastsList = [{'code': 403, 'message': 'Forbidden',
+                       'identifier': 'message.forbidden'}]
+        return {'code': 403, 'data': {}, 'toast': toastsList}
 
 
 if __name__ == '__main__':

@@ -17,7 +17,7 @@
 
     var currentThreadId = "{% if thread['thread'] %}{{thread['thread']}}{% endif %}";
 
-    var language = "zh_cn"; // 语言选择见Fab
+    var language = "zh_hans"; // 语言选择见Fab
 
     function newThreadModal() {
         $('#modalNewThread').modal('open');
@@ -32,7 +32,7 @@
     $("#l10n-fab").click(l10nModal);
 
     function newThread() {
-        $("#newThreadModel").append(`<div class="progress" id="newThreadModalProgress">
+        $("#modalNewThread").append(`<div class="progress" id="newThreadModalProgress">
             <div class="indeterminate"></div>
         </div>`)
         var formObject = {}
@@ -52,10 +52,18 @@
                     $('.modal').modal('close');
                     $("#newThreadForm")[0].reset();
                     $("#threadInputField").val(data.data.thread)
+                    $('#replyFormContainer').addClass("invisible");
+                    $('#threadClosedText').addClass("invisible");
+                    $('#threadContainer').empty();
+                    $('#threadFormContainer').removeClass("invisible");
+                    $("#submitThreadButton").removeClass("disabled");
                     submitThread()
                     $("#threadInputField").val("")
                 } else {
-                    M.toast({html: `${data['code']} - <span class="translate" data-identifier="${data.data['identifier']}">${data.data['message']}</span>`})
+                    for (i in data['toast']){
+                        M.toast({html: `<span>${data['toast'][i]['code']}</span><span>&nbsp;-&nbsp;</span><span class="translate" data-identifier="${data['toast'][i]['identifier']}">${data['toast'][i]['message']}</span>`})
+                    }
+                    callTranslate(document.querySelectorAll(".translate"))
                     $("#newThreadModalProgress").remove();
                 }
             },
@@ -129,7 +137,10 @@
                     currentThreadId = thread['thread'];
                     history.pushState({}, "index", "/thread/" + thread['thread']);
                 } else {
-                    M.toast({html: `<span>${data['code']}</span><span>&nbsp;-&nbsp;</span><span class="translate" data-identifier="${data.data['identifier']}">${data.data['message']}</span>`})
+                    for (i in data['toast']){
+                        M.toast({html: `<span>${data['toast'][i]['code']}</span><span>&nbsp;-&nbsp;</span><span class="translate" data-identifier="${data['toast'][i]['identifier']}">${data['toast'][i]['message']}</span>`})
+                    }
+                    callTranslate(document.querySelectorAll(".translate"))
                     $("#replyThreadButton").removeClass("disabled");
                 }
             },
@@ -202,7 +213,10 @@
                     currentThreadId = thread['thread'];
                     history.pushState({}, "index", "/thread/" + thread['thread']);
                 } else {
-                    M.toast({html: `<span>${data['code']}</span><span>&nbsp;-&nbsp;</span><span class="translate" data-identifier="${data.data['identifier']}">${data.data['message']}</span>`})
+                    for (i in data['toast']){
+                        M.toast({html: `<span>${data['toast'][i]['code']}</span><span>&nbsp;-&nbsp;</span><span class="translate" data-identifier="${data['toast'][i]['identifier']}">${data['toast'][i]['message']}</span>`})
+                    }
+                    callTranslate(document.querySelectorAll(".translate"))
                     $("#submitThreadButton").removeClass("disabled")
                 }
             },
@@ -217,8 +231,7 @@
     $('#submitThreadButton').click(submitThread)
     $('#backToIndex').click(backToIndex)
 
-    var dict =
-    {{ langs|safe }}
+    var dict = {{ langs|safe }}
 
     // 暂时似乎不起作用，Toast无法被翻译
     // 选择需要观察变动的节点
