@@ -1,0 +1,15 @@
+{
+    "name": "user",
+    "identifier": "group.user",
+    "permissions": [
+        "GET",
+        "REPLY",
+        "CREATE",
+        "QUERY",
+        "EDIT_SELF",
+        "DELETE_SELF",
+        "CLOSE_SELF",
+        "REOPEN_SELF"
+    ],
+    "superior_to": []
+}

@@ -1,0 +1,11 @@
+{
+    "name": "anonymous",
+    "identifier": "group.anonymous",
+    "permissions": [
+        "GET",
+        "REPLY",
+        "CREATE",
+        "QUERY"
+    ],
+    "superior_to": []
+}

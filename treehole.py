@@ -85,6 +85,7 @@ class Thread(Base):
 
 
 lang_path = 'static/lang/'
+permission_path = 'permission/'
 
 
 def getLangName(path):
@@ -108,6 +109,22 @@ def loadLang(lang_list):
             langs.update({name: lang})
     return langs
 
+def getGroupName(path):
+    group_list = []
+    f_list = os.listdir(path)
+    for i in f_list:
+        if os.path.splitext(i)[-1] == '.json':
+            group_list.append(i)
+    return {'path': path, 'group_list': group_list}
+
+def loadGroup(group_list):
+    groups = {}
+    for i in group_list['group_list']:
+        with open(group_list['path']+i, 'r', encoding='utf8') as f:
+            data = json.load(f)
+            name = os.path.splitext(i)[0]
+            groups.update({name: data})
+    return groups
 
 @app.route('/')
 @app.route('/index')
@@ -209,7 +226,7 @@ def unknownThread():
                 if not recv_data['data']['title']:
                     recv_data['data'].update({'title': 'Untitled'})
                 if not recv_data['data']['username']:
-                    recv_data['data'].update({'username': 'Anonymous'})
+                    recv_data['data'].update({'username': request.remote_addr})
                 if not recv_data['data']['content']:
                     recv_data['data'].update(
                         {'content': 'No description provided.'})
@@ -317,6 +334,8 @@ def knownThread(id):
                 toastsList = [
                     {'code': 500, 'message': 'Internal Server Error', 'identifier': 'message.ise'}]
                 return {'code': 500, 'data': {}, 'toast': toastsList}
+        elif recv_data['action'] == "edit":
+            pass
         elif recv_data['action'] == "delete":
             pass
         elif recv_data['action'] == "close":

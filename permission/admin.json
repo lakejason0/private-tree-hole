@@ -1,0 +1,32 @@
+{
+    "name": "Admin",
+    "identifier": "group.admin",
+    "permissions": [
+        "GET",
+        "REPLY",
+        "CREATE",
+        "QUERY",
+        "EDIT_SELF",
+        "EDIT_SAME_GROUP",
+        "EDIT_OTHERS",
+        "DELETE_SELF",
+        "DELETE_SAME_GROUP",
+        "DELETE_OTHERS",
+        "CLOSE_SELF",
+        "CLOSE_SAME_GROUP",
+        "CLOSE_OTHERS",
+        "REOPEN_SELF",
+        "REOPEN_SAME_GROUP",
+        "REOPEN_OTHERS",
+        "PUBLICIZE_SELF",
+        "PUBLICIZE_SAME_GROUP",
+        "PUBLICIZE_OTHERS",
+        "DEPUBLICIZE_SELF",
+        "DEPUBLICIZE_SAME_GROUP",
+        "DEPUBLICIZE_OTHERS"
+    ],
+    "superior_to": [
+        "user",
+        "anonymous"
+    ]
+}

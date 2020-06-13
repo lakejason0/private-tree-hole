@@ -29,5 +29,8 @@
     "l10n.settings.title": "语言设置",
     "l10n.settings.selectLanguage": "选择语言",
     "l10n.settings.submit": "提交",
-    "l10n.settings.close": "关闭"
+    "l10n.settings.close": "关闭",
+    "group.admin": "管理员",
+    "group.user": "用户",
+    "group.anonymous": "匿名用户"
 }

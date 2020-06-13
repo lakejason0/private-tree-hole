@@ -29,5 +29,8 @@
     "l10n.settings.title": "Localization settings",
     "l10n.settings.selectLanguage": "Select a language",
     "l10n.settings.submit": "Submit",
-    "l10n.settings.close": "Close"
+    "l10n.settings.close": "Close",
+    "group.admin": "Admin",
+    "group.user": "User",
+    "group.anonymous": "Anonymous"
 }
