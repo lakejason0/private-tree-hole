@@ -1,10 +1,12 @@
 from flask import Flask, render_template, request, jsonify
+from flask_login import LoginManager, UserMixin
 from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy import Column, String, Boolean, Integer, TIMESTAMP, DATETIME, Date, DECIMAL, Text, create_engine
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy.ext.declarative import declarative_base
 from datetime import datetime, date
 from db_export import USERNAME, PASSWORD, HOST, PORT, DATABASE
+from werkzeug.security import generate_password_hash, check_password_hash
 import json
 import pymysql
 import random
@@ -25,6 +27,7 @@ db = SQLAlchemy(app)
 
 Base = declarative_base(engine)
 
+login = LoginManager(app)
 
 class DateEncoder(json.JSONEncoder):
     def default(self, obj):
@@ -83,7 +86,7 @@ class Thread(Base):
         }
         return json.dumps(json_data, cls=DateEncoder)
 
-class User(Base):
+class User(Base, UserMixin):
     __tablename__ = 'user'
 
     id = Column(Integer, primary_key=True, autoincrement=True)
@@ -99,6 +102,15 @@ class User(Base):
             'email': self.email
         }
         return json.dumps(json_data, cls=DateEncoder)
+    
+    def set_password(self, password):
+        self.password_hash = generate_password_hash(password)
+
+    def check_password(self, password):
+        return check_password_hash(self.password_hash, password)
+
+    def login(self):
+        login_user(self)
 
 class Options(Base):
     __tablename__ = 'options'
@@ -119,6 +131,7 @@ class Options(Base):
 lang_path = 'static/lang/'
 permission_path = 'permission/'
 DEFAULT_USER_GROUP = 'anonymous'
+PAGENIATE_POSTS_AMOUNT = 30
 
 
 def getLangName(path):
@@ -208,9 +221,23 @@ def public():
 
 @app.route('/login')
 @app.route('/login.html')
-def logging():
+def login_page():
     langs = loadLang(getLangName(lang_path))
     return render_template("loginView.html", thread={"thread": ""}, langs=langs)
+
+@app.route('/api/login', methods=['POST'])
+def logging():
+    recv_data = json.loads(request.get_data('data'))
+
+@app.route('/register')
+@app.route('/register.html')
+def register_page():
+    langs = loadLang(getLangName(lang_path))
+    return render_template("registerView.html", thread={"thread": ""}, langs=langs)
+
+@app.route('/api/register', methods=['POST'])
+def registering():
+    recv_data = json.loads(request.get_data('data'))
 
 
 @app.route('/api')
