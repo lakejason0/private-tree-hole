@@ -83,9 +83,42 @@ class Thread(Base):
         }
         return json.dumps(json_data, cls=DateEncoder)
 
+class User(Base):
+    __tablename__ = 'user'
+
+    id = Column(Integer, primary_key=True, autoincrement=True)
+    username = Column(String(25),nullable=False,unique=True)
+    password_hash = Column(String(128), nullable=False)
+    group = Column(Text, nullable=False)
+    email = Column(Text, nullable=False)
+
+    def to_json(self):
+        json_data = {
+            'username': self.username,
+            'password_hash': self.password_hash,
+            'email': self.email
+        }
+        return json.dumps(json_data, cls=DateEncoder)
+
+class Options(Base):
+    __tablename__ = 'options'
+
+    id = Column(Integer, primary_key=True, autoincrement=True)
+    username = Column(String(25),nullable=False)
+    option = Column(Text, nullable=False)
+    value = Column(Text, nullable=False)
+
+    def to_json(self):
+        json_data = {
+            'username': self.username,
+            'option': self.option,
+            'value': self.value
+        }
+        return json.dumps(json_data, cls=DateEncoder)
 
 lang_path = 'static/lang/'
 permission_path = 'permission/'
+DEFAULT_USER_GROUP = 'anonymous'
 
 
 def getLangName(path):

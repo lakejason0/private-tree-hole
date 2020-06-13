@@ -84,18 +84,32 @@ class User(Base):
     username = Column(String(25),nullable=False,unique=True)
     password_hash = Column(String(128), nullable=False)
     group = Column(Text, nullable=False)
-    setting = Column(Text, nullable=False)
     email = Column(Text, nullable=False)
 
     def to_json(self):
         json_data = {
-            'thread': self.thread,
-            'is_closed': self.is_closed,
-            'is_deleted': self.is_deleted,
-            'is_announcement': self.is_announcement,
-            'title': self.title
+            'username': self.username,
+            'password_hash': self.password_hash,
+            'email': self.email
         }
         return json.dumps(json_data, cls=DateEncoder)
+
+class Options(Base):
+    __tablename__ = 'options'
+
+    id = Column(Integer, primary_key=True, autoincrement=True)
+    username = Column(String(25),nullable=False)
+    option = Column(Text, nullable=False)
+    value = Column(Text, nullable=False)
+
+    def to_json(self):
+        json_data = {
+            'username': self.username,
+            'option': self.option,
+            'value': self.value
+        }
+        return json.dumps(json_data, cls=DateEncoder)
+
 
 Base.metadata.create_all(engine)
 
