@@ -20,6 +20,7 @@
     "login.formTitle": "Login",
     "login.username": "Username",
     "login.password": "Password",
+    "login.registerButton": "Register",
     "register.formTitle": "Register",
     "register.username": "Username",
     "register.password": "Password",

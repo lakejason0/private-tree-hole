@@ -20,6 +20,7 @@
     "login.formTitle": "登录",
     "login.username": "用户名",
     "login.password": "密码",
+    "login.registerButton": "注册",
     "register.formTitle": "注册",
     "register.username": "用户名",
     "register.password": "密码",
