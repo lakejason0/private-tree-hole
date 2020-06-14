@@ -304,7 +304,8 @@ def unknownThread():
                     {'code': 500, 'message': 'Internal Server Error', 'identifier': 'message.ise'}]
                 return {'code': 500, 'data': {}, 'toast': toastsList}
         elif recv_data['action'] == "query":
-            pass
+            if recv_data['data']['type'] == "thread":
+                pass
     except Exception as err:
         print(err)
         toastsList = [
