@@ -13,3 +13,12 @@ HOST = 'lakejason0.ml'
 PORT = 3306
 DATABASE = 'treehole'
 ```
+## API
+
+### `api/thread/<id>`
+
+#### 方法
+
+使用`GET`或`POST`。
+
+#### 参数
