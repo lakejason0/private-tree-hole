@@ -33,6 +33,10 @@ DATABASE = 'treehole'
 
 好像就没了.jpg
 
+`data`中含有`thread`和`posts`字段。`thread`为UID，`posts`为总共的层帖。
+
+关于posts中每一项的格式，请参照后端中数据类的`to_json`方法。
+
 ###### `reply`
 
 `data`内部应该包含`username`和`content`。任何`content`为空的请求都会被告知`400`错误。
@@ -59,13 +63,19 @@ DATABASE = 'treehole'
 
 后端内部，`data`内部还会包含`time`和`floor`，同样会被覆写。
 
+返回的`data`中包含一个`thread`字段，此为新Thread的UID。
+
 ### `/api/public`
 
 #### 方法
 
 随意。
 
-### 返回
+#### 数据返回
+
+返回的`data`中包含一个`announcements`字段，一个列表。
+
+### 通用返回
 
 所有API返回的JSON都会包含以下字段：
 
