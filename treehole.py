@@ -172,6 +172,8 @@ def loadGroup(group_list):
             groups.update({name: data})
     return groups
 
+''' Deprecated
+
 @app.route('/')
 @app.route('/index')
 @app.route('/index.html')
@@ -225,15 +227,22 @@ def login_page():
     langs = loadLang(getLangName(lang_path))
     return render_template("loginView.html", thread={"thread": ""}, langs=langs)
 
-@app.route('/api/login', methods=['POST'])
-def logging():
-    recv_data = json.loads(request.get_data('data'))
+'''
+
+''' Deprecated
 
 @app.route('/register')
 @app.route('/register.html')
 def register_page():
     langs = loadLang(getLangName(lang_path))
     return render_template("registerView.html", thread={"thread": ""}, langs=langs)
+
+'''
+
+@app.route('/api/login', methods=['POST'])
+def logging():
+    recv_data = json.loads(request.get_data('data'))
+
 
 @app.route('/api/register', methods=['POST'])
 def registering():
