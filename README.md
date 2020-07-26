@@ -1,6 +1,8 @@
 # private-tree-hole
 重复造轮子。
 
+计划重构。会用Vue重构一个Repo出来。
+
 ## 也许你需要自己用
 创建```db_export.py```
 里面填写
