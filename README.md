@@ -43,6 +43,8 @@ DATABASE = 'treehole'
 
 后端内部，`data`内部还会包含`time`，但处理时会覆写前端所提供的`time`参数。
 
+返回的东西同上。以后可能会改。
+
 ### `/api/thread`
 
 #### 方法
