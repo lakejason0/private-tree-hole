@@ -1,18 +1,19 @@
-from flask import Flask, render_template, request, jsonify
+import json
+import os
+import random
+import string
+import time
+from datetime import datetime, date
+
+from flask import Flask, request
 from flask_login import LoginManager, UserMixin
 from flask_sqlalchemy import SQLAlchemy
-from sqlalchemy import Column, String, Boolean, Integer, TIMESTAMP, DATETIME, Date, DECIMAL, Text, create_engine
-from sqlalchemy.orm import sessionmaker
+from sqlalchemy import Column, String, Boolean, Integer, TIMESTAMP, DECIMAL, Text, create_engine
 from sqlalchemy.ext.declarative import declarative_base
-from datetime import datetime, date
-from db_export import USERNAME, PASSWORD, HOST, PORT, DATABASE
+from sqlalchemy.orm import sessionmaker
 from werkzeug.security import generate_password_hash, check_password_hash
-import json
-import pymysql
-import random
-import time
-import string
-import os
+
+from db_export import USERNAME, PASSWORD, HOST, PORT, DATABASE
 
 app = Flask(__name__)
 
@@ -28,6 +29,7 @@ db = SQLAlchemy(app)
 Base = declarative_base(engine)
 
 login = LoginManager(app)
+
 
 class DateEncoder(json.JSONEncoder):
     def default(self, obj):
@@ -86,11 +88,12 @@ class Thread(Base):
         }
         return json.dumps(json_data, cls=DateEncoder)
 
+
 class User(Base, UserMixin):
     __tablename__ = 'user'
 
     id = Column(Integer, primary_key=True, autoincrement=True)
-    username = Column(String(25),nullable=False,unique=True)
+    username = Column(String(25), nullable=False, unique=True)
     password_hash = Column(String(128), nullable=False)
     group = Column(Text, nullable=False)
     email = Column(Text, nullable=False)
@@ -102,7 +105,7 @@ class User(Base, UserMixin):
             'email': self.email
         }
         return json.dumps(json_data, cls=DateEncoder)
-    
+
     def set_password(self, password):
         self.password_hash = generate_password_hash(password)
 
@@ -112,11 +115,12 @@ class User(Base, UserMixin):
     def login(self):
         login_user(self)
 
+
 class Options(Base):
     __tablename__ = 'options'
 
     id = Column(Integer, primary_key=True, autoincrement=True)
-    username = Column(String(25),nullable=False)
+    username = Column(String(25), nullable=False)
     option = Column(Text, nullable=False)
     value = Column(Text, nullable=False)
 
@@ -128,10 +132,19 @@ class Options(Base):
         }
         return json.dumps(json_data, cls=DateEncoder)
 
+
 lang_path = 'static/lang/'
 permission_path = 'permission/'
 DEFAULT_USER_GROUP = 'anonymous'
 PAGENIATE_POSTS_AMOUNT = 30
+
+from routes.user import route as UserRoute
+from routes.thread import route as ThreadRoute
+from routes.announcement import route as AnnRoute
+
+app.register_blueprint(UserRoute, url_prefix='/api/user')
+app.register_blueprint(ThreadRoute, url_prefix='/api/thread')
+app.register_blueprint(AnnRoute, url_prefix='/api/announcement')
 
 
 def getLangName(path):
@@ -149,11 +162,12 @@ def getLangName(path):
 def loadLang(lang_list):
     langs = {}
     for i in lang_list['lang_list']:
-        with open(lang_list['path']+i, 'r', encoding='utf8') as f:
+        with open(lang_list['path'] + i, 'r', encoding='utf8') as f:
             lang = json.load(f)
             name = os.path.splitext(i)[0]
             langs.update({name: lang})
     return langs
+
 
 def getGroupName(path):
     group_list = []
@@ -163,90 +177,15 @@ def getGroupName(path):
             group_list.append(i)
     return {'path': path, 'group_list': group_list}
 
+
 def loadGroup(group_list):
     groups = {}
     for i in group_list['group_list']:
-        with open(group_list['path']+i, 'r', encoding='utf8') as f:
+        with open(group_list['path'] + i, 'r', encoding='utf8') as f:
             data = json.load(f)
             name = os.path.splitext(i)[0]
             groups.update({name: data})
     return groups
-
-''' Deprecated
-
-@app.route('/')
-@app.route('/index')
-@app.route('/index.html')
-def index():
-    langs = loadLang(getLangName(lang_path))
-    return render_template("default.html", thread={"thread": ""}, getThreadFormVisible="", replyFormVisible="invisible", langs=langs)
-
-
-@app.route('/thread/<id>')
-@app.route('/thread/<id>.html')
-def thread(id):
-    langs = loadLang(getLangName(lang_path))
-    try:
-        session = DBSession()
-        posts = session.query(Post).filter(
-            (Post.thread == id) and (Post.is_deleted == 0)).all()
-        postslist = []
-        for i in posts:
-            postslist.append(json.loads(i.to_json()))
-        thread = json.loads(session.query(Thread).filter(
-            (Thread.thread == id) and (Thread.is_deleted == 0)).first().to_json())
-        if postslist or thread:
-            #    print(postslist)
-            session.close()
-            return render_template("threadView.html", thread=thread, posts=postslist, getThreadFormVisible="invisible", replyFormVisible="", langs=langs)
-        else:
-            session.close()
-            return render_template("errorView.html", getThreadFormVisible="invisible", replyFormVisible="", langs=langs)
-    except:
-        session.close()
-        return render_template("errorView.html", getThreadFormVisible="invisible", replyFormVisible="", langs=langs)
-
-
-@app.route('/public')
-@app.route('/public.html')
-def public():
-    langs = loadLang(getLangName(lang_path))
-    session = DBSession()
-    announcements = session.query(Thread).filter(
-        (Thread.is_announcement == 1) and (Thread.is_deleted == 0)).all()
-    announcementsList = []
-    for i in announcements:
-        announcementsList.append(json.loads(i.to_json()))
-    session.close()
-    return render_template("announcementView.html", thread={"thread": ""}, announcements=announcements, langs=langs)
-
-
-@app.route('/login')
-@app.route('/login.html')
-def login_page():
-    langs = loadLang(getLangName(lang_path))
-    return render_template("loginView.html", thread={"thread": ""}, langs=langs)
-
-'''
-
-''' Deprecated
-
-@app.route('/register')
-@app.route('/register.html')
-def register_page():
-    langs = loadLang(getLangName(lang_path))
-    return render_template("registerView.html", thread={"thread": ""}, langs=langs)
-
-'''
-
-@app.route('/api/login', methods=['POST'])
-def logging():
-    recv_data = json.loads(request.get_data('data'))
-
-
-@app.route('/api/register', methods=['POST'])
-def registering():
-    recv_data = json.loads(request.get_data('data'))
 
 
 @app.route('/api')
@@ -275,8 +214,11 @@ def unknownThread():
         print(recv_data['action'])
         if recv_data['action'] == "create":
             print(recv_data['action'])
-            def rand_str(n): return ''.join([random.choice(
-                string.ascii_lowercase+string.ascii_uppercase+string.digits) for i in range(n)])
+
+            def rand_str(n):
+                return ''.join([random.choice(
+                    string.ascii_lowercase + string.ascii_uppercase + string.digits) for i in range(n)])
+
             newThreadId = rand_str(random.randint(6, 30))
             print(newThreadId)
             session = DBSession()
@@ -301,8 +243,10 @@ def unknownThread():
                         {'content': 'No description provided.'})
                 newThreadMetadata = Thread(thread=newThreadId, is_closed=False, is_deleted=False,
                                            is_announcement=False, title=recv_data['data']['title'])
-                newThread = Post(thread=newThreadId, username=recv_data['data']['username'], time=recv_data['data']['time'],
-                                 floor=recv_data['data']['floor'], is_deleted=False, content=recv_data['data']['content'])
+                newThread = Post(thread=newThreadId, username=recv_data['data']['username'],
+                                 time=recv_data['data']['time'],
+                                 floor=recv_data['data']['floor'], is_deleted=False,
+                                 content=recv_data['data']['content'])
                 session.add(newThread)
                 session.add(newThreadMetadata)
                 session.commit()
@@ -374,10 +318,12 @@ def knownThread(id):
                             recv_data['data'].update({'floor': floor})
                         else:
                             toastsList = [
-                                {'message': 'Can\'t find the correct floor number.', 'identifier': 'message.floorNumberError'}]
+                                {'message': 'Can\'t find the correct floor number.',
+                                 'identifier': 'message.floorNumberError'}]
                             return {'code': 500, 'data': {}, 'toast': toastsList}
                         reply = Post(thread=id, username=recv_data['data']['username'], time=recv_data['data']['time'],
-                                     floor=recv_data['data']['floor'], is_deleted=False, content=recv_data['data']['content'])
+                                     floor=recv_data['data']['floor'], is_deleted=False,
+                                     content=recv_data['data']['content'])
                         session.add(reply)
                         session.commit()
                         posts = session.query(Post).filter(
@@ -392,12 +338,14 @@ def knownThread(id):
                     else:
                         session.close()
                         toastsList = [
-                            {'code': 403, 'message': 'The thread you\'re replying to is closed.', 'identifier': 'message.closedThread'}]
+                            {'code': 403, 'message': 'The thread you\'re replying to is closed.',
+                             'identifier': 'message.closedThread'}]
                         return {'code': 403, 'data': {}, 'toast': toastsList}
                 else:
                     session.close()
                     toastsList = [
-                        {'code': 404, 'message': 'The thread you\'re replying to is missing.', 'identifier': 'message.missingThread'}]
+                        {'code': 404, 'message': 'The thread you\'re replying to is missing.',
+                         'identifier': 'message.missingThread'}]
                     return {'code': 404, 'data': {}, 'toast': toastsList}
             except Exception as err:
                 print(err)
