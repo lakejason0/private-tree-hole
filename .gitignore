@@ -129,3 +129,5 @@ dmypy.json
 .pyre/
 .idea/
 db_export.py
+
+.vscode/
