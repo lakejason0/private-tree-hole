@@ -85,9 +85,11 @@ def loadGroup(group_list):
             groups.update({name: data})
     return groups
 
+@app.route('/api/ping')
+def ping():
+    return {"code": 200, "data": {}, "toast":{}}
 
 @app.route('/api')
-@app.route('/api/ping')
 def api():
     recv_data = {"code": 200, "data": json.loads(request.get_data('data'))}
     return recv_data
