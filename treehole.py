@@ -87,6 +87,7 @@ def loadGroup(group_list):
 
 
 @app.route('/api')
+@app.route('/api/ping')
 def api():
     recv_data = {"code": 200, "data": json.loads(request.get_data('data'))}
     return recv_data
