@@ -87,7 +87,8 @@ def loadGroup(group_list):
 
 @app.route('/api/ping')
 def ping():
-    return {"code": 200, "data": {}, "toast":{}}
+    return {"code": 200, "data": {}, "toast": {}}
+
 
 @app.route('/api')
 def api():
@@ -104,8 +105,11 @@ def publics():
     for i in publics:
         publicList.append(json.loads(i.to_json()))
     session.close()
-    return {'code': 200, 'data': {"publics": publicList}}
-
+    if publicList:
+        return {'code': 200, 'data': {'publics': publicList}, 'toast':[]}
+    else:
+        toastsList = [{'code': 404, 'message': 'No public post exists', 'identifier': 'message.emptyPublic'}]
+        return {'code': 404, 'data': {}, 'toast': toastsList}
 
 @app.route('/api/thread', methods=['POST'])
 def unknownThread():
@@ -133,7 +137,8 @@ def unknownThread():
                 recv_data['data'].update({'floor': 1})
                 if (not recv_data['data']['title']) and (not recv_data['data']['content']):
                     session.close()
-                    toastsList = [{'code': 400, 'message': 'Nothing is provided', 'identifier': 'message.emptyPost'}]
+                    toastsList = [
+                        {'code': 400, 'message': 'Nothing is provided', 'identifier': 'message.emptyPost'}]
                     return {'code': 400, 'data': {}, 'toast': toastsList}
                 if not recv_data['data']['title']:
                     recv_data['data'].update({'title': 'Untitled'})
@@ -142,8 +147,11 @@ def unknownThread():
                 if not recv_data['data']['content']:
                     recv_data['data'].update(
                         {'content': 'No description provided.'})
+                if not recv_data['data']['is_public']:
+                    recv_data['data'].update(
+                        {'is_public': False})
                 newThreadMetadata = Thread(thread=newThreadId, is_closed=False, is_deleted=False,
-                                           is_public=False, title=recv_data['data']['title'])
+                                           is_public=recv_data['data']['is_public'], title=recv_data['data']['title'])
                 newThread = Post(thread=newThreadId, username=recv_data['data']['username'],
                                  time=recv_data['data']['time'],
                                  floor=recv_data['data']['floor'], is_deleted=False,
