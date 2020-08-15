@@ -75,7 +75,7 @@ DATABASE = 'treehole'
 
 #### 数据返回
 
-返回的`data`中包含一个`announcements`字段，一个列表。
+返回的`data`中包含一个`publics`字段，一个列表。
 
 ### 通用返回
 

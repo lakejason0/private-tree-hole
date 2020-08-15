@@ -2,4 +2,4 @@ import json
 
 from flask import Blueprint, request
 
-route = Blueprint('announcement', __name__)
+route = Blueprint('public', __name__)

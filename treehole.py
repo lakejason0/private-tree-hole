@@ -38,11 +38,11 @@ PAGENIATE_PlOSTS_AMOUNT = 30
 from models import Post, Thread
 from routes.user import route as UserRoute
 from routes.thread import route as ThreadRoute
-from routes.announcement import route as AnnRoute
+from routes.public import route as AnnRoute
 
 app.register_blueprint(UserRoute, url_prefix='/api/user')
 app.register_blueprint(ThreadRoute, url_prefix='/api/thread')
-app.register_blueprint(AnnRoute, url_prefix='/api/announcement')
+app.register_blueprint(AnnRoute, url_prefix='/api/public')
 
 
 def getLangName(path):
@@ -96,15 +96,15 @@ def api():
 
 
 @app.route('/api/public')
-def announcements():
+def publics():
     session = DBSession()
-    announcements = session.query(Thread).filter(
-        (Thread.is_announcement == 1) and (Thread.is_deleted == 0)).all()
-    announcementsList = []
-    for i in announcements:
-        announcementsList.append(json.loads(i.to_json()))
+    publics = session.query(Thread).filter(
+        (Thread.is_public == 1) and (Thread.is_deleted == 0)).all()
+    publicList = []
+    for i in publics:
+        publicList.append(json.loads(i.to_json()))
     session.close()
-    return {'code': 200, 'data': {"announcements": announcementsList}}
+    return {'code': 200, 'data': {"publics": publicList}}
 
 
 @app.route('/api/thread', methods=['POST'])
@@ -143,7 +143,7 @@ def unknownThread():
                     recv_data['data'].update(
                         {'content': 'No description provided.'})
                 newThreadMetadata = Thread(thread=newThreadId, is_closed=False, is_deleted=False,
-                                           is_announcement=False, title=recv_data['data']['title'])
+                                           is_public=False, title=recv_data['data']['title'])
                 newThread = Post(thread=newThreadId, username=recv_data['data']['username'],
                                  time=recv_data['data']['time'],
                                  floor=recv_data['data']['floor'], is_deleted=False,

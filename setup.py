@@ -65,7 +65,7 @@ class Thread(Base):
     thread = Column(String(30), nullable=False)
     is_closed = Column(Boolean, nullable=False)
     is_deleted = Column(Boolean, nullable=False)
-    is_announcement = Column(Boolean, nullable=False)
+    is_public = Column(Boolean, nullable=False)
     title = Column(Text, nullable=False)
 
     def to_json(self):
@@ -73,7 +73,7 @@ class Thread(Base):
             'thread': self.thread,
             'is_closed': self.is_closed,
             'is_deleted': self.is_deleted,
-            'is_announcement': self.is_announcement,
+            'is_public': self.is_public,
             'title': self.title
         }
         return json.dumps(json_data, cls=DateEncoder)
