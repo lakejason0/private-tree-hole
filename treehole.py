@@ -98,18 +98,23 @@ def api():
 
 @app.route('/api/public')
 def publics():
-    session = DBSession()
-    publics = session.query(Thread).filter(
-        (Thread.is_public == 1) and (Thread.is_deleted == 0)).all()
-    publicList = []
-    for i in publics:
-        publicList.append(json.loads(i.to_json()))
-    session.close()
-    if publicList:
-        return {'code': 200, 'data': {'publics': publicList}, 'toast':[]}
-    else:
-        toastsList = [{'code': 404, 'message': 'No public post exists', 'identifier': 'message.emptyPublic'}]
-        return {'code': 404, 'data': {}, 'toast': toastsList}
+    try:
+        session = DBSession()
+        publics = session.query(Thread).filter(
+            (Thread.is_public == 1) and (Thread.is_deleted == 0)).all()
+        publicList = []
+        for i in publics:
+            publicList.append(json.loads(i.to_json()))
+        session.close()
+        if publicList:
+            return {'code': 200, 'data': {'publics': publicList}, 'toast':[]}
+        else:
+            toastsList = [{'code': 404, 'message': 'No public post exists', 'identifier': 'message.emptyPublic'}]
+            return {'code': 404, 'data': {}, 'toast': toastsList}
+    except Exception as err:
+        print(err)
+        toastsList = [{'code': 500, 'message': 'Internal server error', 'identifier': 'message.ise'}]
+        return {'code': 500, 'data': {}, 'toast': toastsList}
 
 @app.route('/api/thread', methods=['POST'])
 def unknownThread():
