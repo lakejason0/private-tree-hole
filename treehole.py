@@ -11,6 +11,7 @@ from flask import Flask, request
 from flask_login import LoginManager
 from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy import create_engine
+from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker
 
 import shared
@@ -39,10 +40,13 @@ permission_path = 'permission/'
 DEFAULT_USER_GROUP = 'anonymous'
 PAGENIATE_PlOSTS_AMOUNT = 30
 
-from models import Post, Thread
+
+from models import Post, Thread, Base
 from routes.user import route as UserRoute
 from routes.thread import route as ThreadRoute
 from routes.public import route as AnnRoute
+
+Base.metadata.create_all(engine)
 
 app.register_blueprint(UserRoute, url_prefix='/api/user')
 app.register_blueprint(ThreadRoute, url_prefix='/api/thread')

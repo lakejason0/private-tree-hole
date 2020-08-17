@@ -69,7 +69,7 @@ class Thread(Base):
         return json.dumps(json_data, cls=DateEncoder)
 
 
-class User(shared.db.Model, Base, UserMixin):
+class User(Base, shared.db.Model):
     __tablename__ = 'user'
 
     id = Column(Integer, primary_key=True, autoincrement=True)

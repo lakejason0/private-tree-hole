@@ -2,21 +2,14 @@ import json
 import os
 
 from flask import Blueprint, request
-from flask_login import login_user
 
 import shared
 import jwt
 import bcrypt
 from models import User
+from functools import wraps
 
 route = Blueprint('user', __name__)
-print(shared.login)
-
-
-@shared.login.user_loader
-def load_user(user_id):
-    user = User.query.filter_by(id=user_id).first()
-    return user
 
 
 @route.route('/login', methods=['POST'])
@@ -54,4 +47,40 @@ def registerRoute():
         'data': {
             'success': True
         },
+    }
+
+
+def needLogin():
+    def _needLogin(f):
+        @wraps(f)
+        def __needLogin(*args, **kwargs):
+            token = request.headers.get("Authorization")[7:]
+            try:
+                data = jwt.decode(token, os.getenv("JWT_SECRET"), algorithms=['HS256'])
+                user = User.query.filter_by(id=data['uid']).first()
+                if user is None:
+                    raise Exception("用户不存在!")
+                request.user = user
+
+            except Exception as err:
+                print(err)
+                return {
+                    'code': 401
+                }
+            result = f(*args, **kwargs)
+            return result
+
+        return __needLogin
+
+    return _needLogin
+
+
+@route.route('/info', methods=['GET'])
+@needLogin()
+def infoRoute():
+    return {
+        'code': 200,
+        'data': {
+            'username': request.user.username
+        }
     }
