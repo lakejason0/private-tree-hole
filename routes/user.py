@@ -15,42 +15,63 @@ route = Blueprint('user', __name__)
 @route.route('/login', methods=['POST'])
 def loginRoute():
     recv_data = json.loads(request.get_data('data'))
-    user = User.query.filter_by(username=recv_data['username']).first()
-    if user and bcrypt.checkpw(recv_data['password'].encode('utf-8'), user.password_hash.encode('utf-8')):
-        token = jwt.encode({'uid': user.id}, os.getenv("JWT_SECRET"), algorithm='HS256')
+    try:
+        user = User.query.filter_by(username=recv_data['username']).first()
+        if user and bcrypt.checkpw(recv_data['password'].encode('utf-8'), user.password_hash.encode('utf-8')):
+            token = jwt.encode({'uid': user.id}, os.getenv("JWT_SECRET"), algorithm='HS256')
+            return {
+                'code': 200,
+                'data': {
+                    'success': True,
+                    'token': token.decode('utf-8')
+                },
+                'toast': []
+            }
         return {
-            'code': 200,
+            'code': 400,
             'data': {
-                'success': True,
-                'token': token.decode('utf-8')
+                'success': False
             },
-            'toast': []
+            'toast': [{'code': 400, 'message': 'The password does not match, or the user does not exist.', 'identifier': 'message.userNotMatching'}]
         }
-    return {
-        'code': 200,
-        'data': {
-            'success': False
-        },
-        'toast': []
-    }
+    except Exception as err:
+        print(err)
+        toastsList = [
+            {'code': 500, 'message': 'Internal Server Error', 'identifier': 'message.ise'}]
+        return {'code': 500, 'data': {}, 'toast': toastsList}
 
 
 @route.route('/register', methods=['POST'])
 def registerRoute():
     recv_data = json.loads(request.get_data('data'))
-    user = User()
-    user.email = recv_data['email']
-    user.username = recv_data['username']
-    user.password_hash = bcrypt.hashpw(recv_data['password'].encode('utf-8'), bcrypt.gensalt())
-    shared.db.session.add(user)
-    shared.db.session.commit()
-    return {
-        'code': 200,
-        'data': {
-            'success': True
-        },
-        'toast': []
-    }
+    try:
+        existingUsers = shared.db.session.query(User).filter(User.username == recv_data['username']).all()
+        if existingUsers:
+            return {
+                'code': 400,
+                'data': [],
+                'toast': [
+                    {'code': 400, 'message': 'The requested username is occupied', 'identifier': 'message.usernameBeingOccupied'}
+                ]
+            }
+        user = User()
+        user.email = recv_data['email']
+        user.username = recv_data['username']
+        user.password_hash = bcrypt.hashpw(recv_data['password'].encode('utf-8'), bcrypt.gensalt())
+        shared.db.session.add(user)
+        shared.db.session.commit()
+        return {
+            'code': 200,
+            'data': {
+                'success': True
+            },
+            'toast': []
+        }
+    except Exception as err:
+        print(err)
+        toastsList = [
+            {'code': 500, 'message': 'Internal Server Error', 'identifier': 'message.ise'}]
+        return {'code': 500, 'data': {}, 'toast': toastsList}
 
 
 def needLogin(block=True):
