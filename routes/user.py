@@ -50,11 +50,12 @@ def registerRoute():
     }
 
 
-def needLogin():
+def needLogin(block=True):
     def _needLogin(f):
         @wraps(f)
         def __needLogin(*args, **kwargs):
             token = request.headers.get("Authorization")[7:]
+            user = None
             try:
                 data = jwt.decode(token, os.getenv("JWT_SECRET"), algorithms=['HS256'])
                 user = User.query.filter_by(id=data['uid']).first()
@@ -64,9 +65,12 @@ def needLogin():
 
             except Exception as err:
                 print(err)
-                return {
-                    'code': 401
-                }
+                user = None
+                if block:
+                    return {
+                        'code': 401
+                    }
+            request.user_logged = user is None
             result = f(*args, **kwargs)
             return result
 
