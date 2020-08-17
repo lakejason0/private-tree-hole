@@ -24,12 +24,14 @@ def loginRoute():
                 'success': True,
                 'token': token.decode('utf-8')
             },
+            'toast': []
         }
     return {
         'code': 200,
         'data': {
             'success': False
         },
+        'toast': []
     }
 
 
@@ -47,6 +49,7 @@ def registerRoute():
         'data': {
             'success': True
         },
+        'toast': []
     }
 
 
@@ -59,13 +62,15 @@ def needLogin():
                 data = jwt.decode(token, os.getenv("JWT_SECRET"), algorithms=['HS256'])
                 user = User.query.filter_by(id=data['uid']).first()
                 if user is None:
-                    raise Exception("用户不存在!")
+                    raise Exception("UserNotFoundException")
                 request.user = user
 
             except Exception as err:
                 print(err)
                 return {
-                    'code': 401
+                    'code': 401,
+                    'data': {},
+                    'toast': [{'code':401,'message':'You are not authourized.','identifier':'message.notAuthorized'}]
                 }
             result = f(*args, **kwargs)
             return result
@@ -82,5 +87,6 @@ def infoRoute():
         'code': 200,
         'data': {
             'username': request.user.username
-        }
+        },
+        'toast': []
     }
