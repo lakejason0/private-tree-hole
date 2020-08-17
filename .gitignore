@@ -131,3 +131,4 @@ dmypy.json
 db_export.py
 
 .vscode/
+.env

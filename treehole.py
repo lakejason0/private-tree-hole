@@ -2,8 +2,11 @@ import json
 import os
 import random
 import string
+import sys
 import time
+import traceback
 
+from dotenv import load_dotenv
 from flask import Flask, request
 from flask_login import LoginManager
 from flask_sqlalchemy import SQLAlchemy
@@ -11,12 +14,13 @@ from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 
 import shared
-from db_export import USERNAME, PASSWORD, HOST, PORT, DATABASE
 
+load_dotenv()
 app = Flask(__name__)
 
 DB_URI = 'mysql+pymysql://{}:{}@{}:{}/{}'.format(
-    USERNAME, PASSWORD, HOST, PORT, DATABASE)
+    os.getenv("DB_USERNAME"), os.getenv("DB_PASSWORD"), os.getenv("DB_HOST"), os.getenv("DB_PORT"),
+    os.getenv("DB_NAME"))
 engine = create_engine(DB_URI)
 shared.engine = engine
 DBSession = sessionmaker(bind=engine)
@@ -85,6 +89,7 @@ def loadGroup(group_list):
             groups.update({name: data})
     return groups
 
+
 @app.route('/api/ping')
 def ping():
     return {"code": 200, "data": {}, "toast": {}}
@@ -107,7 +112,7 @@ def publics():
             publicList.append(json.loads(i.to_json()))
         session.close()
         if publicList:
-            return {'code': 200, 'data': {'publics': publicList}, 'toast':[]}
+            return {'code': 200, 'data': {'publics': publicList}, 'toast': []}
         else:
             toastsList = [{'code': 404, 'message': 'No public post exists', 'identifier': 'message.emptyPublic'}]
             return {'code': 404, 'data': {}, 'toast': toastsList}
@@ -115,6 +120,7 @@ def publics():
         print(err)
         toastsList = [{'code': 500, 'message': 'Internal server error', 'identifier': 'message.ise'}]
         return {'code': 500, 'data': {}, 'toast': toastsList}
+
 
 @app.route('/api/thread', methods=['POST'])
 def unknownThread():
@@ -279,7 +285,8 @@ def knownThread(id):
         elif recv_data['action'] == "depublicize":
             pass
     except Exception as err:
-        print(err)
+        exc_info = sys.exc_info()
+        traceback.print_exception(*exc_info)
         toastsList = [{'code': 403, 'message': 'Forbidden',
                        'identifier': 'message.forbidden'}]
         return {'code': 403, 'data': {}, 'toast': toastsList}

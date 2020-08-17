@@ -1,9 +1,12 @@
 import json
+import os
 
 from flask import Blueprint, request
 from flask_login import login_user
 
 import shared
+import jwt
+import bcrypt
 from models import User
 
 route = Blueprint('user', __name__)
@@ -19,17 +22,21 @@ def load_user(user_id):
 @route.route('/login', methods=['POST'])
 def loginRoute():
     recv_data = json.loads(request.get_data('data'))
-    user = User.query.filter_by(username=recv_data['username']).filter_by(password_hash=recv_data['password']).first()
-    print(user)
-    if user:
-        login_user(user)
+    user = User.query.filter_by(username=recv_data['username']).first()
+    if user and bcrypt.checkpw(recv_data['password'].encode('utf-8'), user.password_hash.encode('utf-8')):
+        token = jwt.encode({'uid': user.id}, os.getenv("JWT_SECRET"), algorithm='HS256')
         return {
             'code': 200,
-            'data': True,
+            'data': {
+                'success': True,
+                'token': token.decode('utf-8')
+            },
         }
     return {
         'code': 200,
-        'data': False
+        'data': {
+            'success': False
+        },
     }
 
 
@@ -39,7 +46,12 @@ def registerRoute():
     user = User()
     user.email = recv_data['email']
     user.username = recv_data['username']
-    user.password_hash = recv_data['password']
+    user.password_hash = bcrypt.hashpw(recv_data['password'].encode('utf-8'), bcrypt.gensalt())
     shared.db.session.add(user)
     shared.db.session.commit()
-    return 'hello'
+    return {
+        'code': 200,
+        'data': {
+            'success': True
+        },
+    }
