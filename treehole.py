@@ -134,10 +134,13 @@ def unknownThread():
     try:
         print(recv_data['action'])
         if recv_data['action'] == "create":
-            if request.user_logged:
-                if (request.user.group != recv_data['data']['username']) and (request.user.group != 'admin'):
-                    toastsList = [{'code': 400, 'message': 'Not matching with currently logged-in user.', 'identifier': 'message.fakeUsername'}]
-                    return {'code': 400, 'data': {}, 'toast': toastsList}
+            try:
+                if request.user_logged:
+                    if (request.user.group != recv_data['data']['username']) and (request.user.group != 'admin'):
+                        toastsList = [{'code': 400, 'message': 'Not matching with currently logged-in user.', 'identifier': 'message.fakeUsername'}]
+                        return {'code': 400, 'data': {}, 'toast': toastsList}
+            except:
+                pass
             print(recv_data['action'])
 
             def rand_str(n):
@@ -200,10 +203,13 @@ def knownThread(id):
     recv_data = json.loads(request.get_data('data'))
     try:
         if recv_data['action'] == "get":
-            if request.user_logged:
-                if (request.user.group != recv_data['data']['username']) and (request.user.group != 'admin'):
-                    toastsList = [{'code': 400, 'message': 'Not matching with currently logged-in user.', 'identifier': 'message.fakeUsername'}]
-                    return {'code': 400, 'data': {}, 'toast': toastsList}
+            try:
+                if request.user_logged:
+                    if (request.user.group != recv_data['data']['username']) and (request.user.group != 'admin'):
+                        toastsList = [{'code': 400, 'message': 'Not matching with currently logged-in user.', 'identifier': 'message.fakeUsername'}]
+                        return {'code': 400, 'data': {}, 'toast': toastsList}
+            except:
+                pass
             session = DBSession()
             if request.user.group == 'admin':
                 posts = session.query(Post).filter(
