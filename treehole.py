@@ -136,7 +136,7 @@ def unknownThread():
         if recv_data['action'] == "create":
             try:
                 if request.user_logged:
-                    if (request.user.group != recv_data['data']['username']) and (request.user.group != 'admin'):
+                    if (request.user.username != recv_data['data']['username']) and (request.user.group != 'admin'):
                         toastsList = [{'code': 400, 'message': 'Not matching with currently logged-in user.', 'identifier': 'message.fakeUsername'}]
                         return {'code': 400, 'data': {}, 'toast': toastsList}
             except:
@@ -203,26 +203,26 @@ def knownThread(id):
     recv_data = json.loads(request.get_data('data'))
     try:
         if recv_data['action'] == "get":
-            try:
-                if request.user_logged:
-                    if (request.user.group != recv_data['data']['username']) and (request.user.group != 'admin'):
-                        toastsList = [{'code': 400, 'message': 'Not matching with currently logged-in user.', 'identifier': 'message.fakeUsername'}]
-                        return {'code': 400, 'data': {}, 'toast': toastsList}
-            except:
-                pass
             session = DBSession()
-            if request.user.group == 'admin':
+            try:
+                if request.user.group == 'admin':
+                    posts = session.query(Post).filter(
+                        (Post.thread == id)).all()
+                else:
+                    posts = session.query(Post).filter(
+                        (Post.thread == id) and (Post.is_deleted == 0)).all()
+            except:
                 posts = session.query(Post).filter(
-                    (Post.thread == id)).all()
-            else:
-                posts = session.query(Post).filter(
-                    (Post.thread == id) and (Post.is_deleted == 0)).all()
+                        (Post.thread == id) and (Post.is_deleted == 0)).all()
             postsList = []
             for i in posts:
                 postsList.append(json.loads(i.to_json()))
-            if request.user.group == 'admin':
-                thread = json.loads(session.query(Thread).filter((Thread.thread == id)).first().to_json())
-            else:
+            try:
+                if request.user.group == 'admin':
+                    thread = json.loads(session.query(Thread).filter((Thread.thread == id)).first().to_json())
+                else:
+                    thread = json.loads(session.query(Thread).filter((Thread.thread == id) and (Thread.is_deleted == 0)).first().to_json())
+            except:
                 thread = json.loads(session.query(Thread).filter((Thread.thread == id) and (Thread.is_deleted == 0)).first().to_json())
             if postsList or thread:
                 #    print(postslist)
