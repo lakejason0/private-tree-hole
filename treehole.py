@@ -197,7 +197,7 @@ def unknownThread():
             {'code': 500, 'message': 'Internal Server Error', 'identifier': 'message.ise'}]
         return {'code': 500, 'data': {}, 'toast': toastsList}
 
-
+@needLogin(block=False)
 @app.route('/api/thread/<id>', methods=['GET', 'POST'])
 def knownThread(id):
     recv_data = json.loads(request.get_data('data'))
