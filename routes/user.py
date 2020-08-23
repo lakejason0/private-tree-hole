@@ -1,13 +1,13 @@
 import json
 import os
+from functools import wraps
 
+import bcrypt
+import jwt
 from flask import Blueprint, request
 
 import shared
-import jwt
-import bcrypt
 from models import User
-from functools import wraps
 
 route = Blueprint('user', __name__)
 
@@ -32,7 +32,8 @@ def loginRoute():
             'data': {
                 'success': False
             },
-            'toast': [{'code': 400, 'message': 'The password does not match, or the user does not exist.', 'identifier': 'message.userNotMatching'}]
+            'toast': [{'code': 400, 'message': 'The password does not match, or the user does not exist.',
+                       'identifier': 'message.userNotMatching'}]
         }
     except Exception as err:
         print(err)
@@ -51,7 +52,8 @@ def registerRoute():
                 'code': 400,
                 'data': [],
                 'toast': [
-                    {'code': 400, 'message': 'The requested username is occupied', 'identifier': 'message.usernameBeingOccupied'}
+                    {'code': 400, 'message': 'The requested username is occupied',
+                     'identifier': 'message.usernameBeingOccupied'}
                 ]
             }
         user = User()
@@ -78,7 +80,7 @@ def needLogin(block=True):
     def _needLogin(f):
         @wraps(f)
         def __needLogin(*args, **kwargs):
-            token = request.headers.get("Authorization")[7:]
+            token = ("Authorization" in request.headers and request.headers.get("Authorization") or "")[7:]
             user = None
             try:
                 data = jwt.decode(token, os.getenv("JWT_SECRET"), algorithms=['HS256'])
@@ -94,7 +96,8 @@ def needLogin(block=True):
                     return {
                         'code': 401,
                         'data': {},
-                        'toast': [{'code': 401, 'message': 'You are not authourized.', 'identifier': 'message.notAuthorized'}]
+                        'toast': [
+                            {'code': 401, 'message': 'You are not authourized.', 'identifier': 'message.notAuthorized'}]
                     }
             request.user_logged = user is not None
             result = f(*args, **kwargs)
