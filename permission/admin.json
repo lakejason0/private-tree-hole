@@ -3,6 +3,7 @@
     "identifier": "group.admin",
     "permissions": [
         "GET",
+        "GET_DELETED",
         "REPLY",
         "CREATE",
         "QUERY",
@@ -23,7 +24,8 @@
         "PUBLICIZE_OTHERS",
         "DEPUBLICIZE_SELF",
         "DEPUBLICIZE_SAME_GROUP",
-        "DEPUBLICIZE_OTHERS"
+        "DEPUBLICIZE_OTHERS",
+        "FAKE_USERNAME"
     ],
     "superior_to": [
         "user",
