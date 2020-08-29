@@ -129,10 +129,9 @@ def publics():
 @needLogin(block=False)
 @app.route('/api/thread', methods=['POST'])
 def unknownThread():
-    recv_data = json.loads(request.get_data('data'))
-    print(recv_data)
     try:
-        print(recv_data['action'])
+        recv_data = json.loads(request.get_data('data'))
+        print(recv_data)
         if recv_data['action'] == "create":
             try:
                 if request.user_logged:
@@ -200,7 +199,10 @@ def unknownThread():
 @needLogin(block=False)
 @app.route('/api/thread/<id>', methods=['GET', 'POST'])
 def knownThread(id):
-    recv_data = json.loads(request.get_data('data'))
+    try:
+        recv_data = json.loads(request.get_data('data'))
+    except:
+        recv_data = {"action":"get"}
     try:
         if recv_data['action'] == "get":
             session = DBSession()
