@@ -115,7 +115,7 @@ def ping():
 
 @app.route('/api')
 def api():
-    recv_data = {"code": 200, "data": json.loads(request.get_data('data'))}
+    recv_data = {"code": 200, "data": json.loads(request.get_data('data', parse_form_data=True))}
     return recv_data
 
 
@@ -124,7 +124,7 @@ def publics():
     try:
         session = DBSession()
         publics = session.query(Thread).filter(
-            (Thread.is_public == True) and (Thread.is_deleted == False)).all()
+            Thread.is_public == True, Thread.is_deleted == False).all()
         publicList = []
         for i in publics:
             publicList.append(json.loads(i.to_json()))
@@ -143,7 +143,7 @@ def publics():
 @app.route('/api/thread', methods=['POST'])
 def unknownThread():
     try:
-        recv_data = json.loads(request.get_data('data'))
+        recv_data = json.loads(request.get_data('data', parse_form_data=True))
         print(recv_data)
         if recv_data['action'] == "create":
             try:
@@ -213,35 +213,42 @@ def unknownThread():
 @app.route('/api/thread/<id>', methods=['GET', 'POST'])
 def knownThread(id):
     try:
-        recv_data = json.loads(request.get_data('data'))
+        recv_data = json.loads(request.get_data('data', parse_form_data=True))
     except:
         recv_data = {"action":"get"}
     try:
         if recv_data['action'] == "get":
             session = DBSession()
             try:
-                if checkPermission(request.user.group, 'GET_DELETED'):
-                    print(1)
-                    posts = session.query(Post).filter(
-                        (Post.thread == id)).all()
+                if request.user_logged:
+                    if checkPermission(request.user.group, 'GET_DELETED'):
+                        print(1)
+                        posts = session.query(Post).filter(
+                            Post.thread == id).all()
+                    else:
+                        posts = session.query(Post).filter(
+                            Post.thread == id, Post.is_deleted == False).all()
                 else:
                     print(2)
                     posts = session.query(Post).filter(
-                        (Post.thread == id) and (Post.is_deleted == False)).all()
+                        Post.thread == id, Post.is_deleted == False).all()
             except:
                 print(3)
                 posts = session.query(Post).filter(
-                        (Post.thread == id) and (Post.is_deleted == False)).all()
+                        Post.thread == id, Post.is_deleted == False).all()
             postsList = []
             for i in posts:
                 postsList.append(json.loads(i.to_json()))
             try:
-                if checkPermission(request.user.group, 'GET_DELETED'):
-                    thread = json.loads(session.query(Thread).filter((Thread.thread == id)).first().to_json())
+                if request.user_logged:
+                    if checkPermission(request.user.group, 'GET_DELETED'):
+                        thread = json.loads(session.query(Thread).filter(Thread.thread == id).first().to_json())
+                    else:
+                        thread = json.loads(session.query(Thread).filter(Thread.thread == id, Thread.is_deleted == False).first().to_json())
                 else:
-                    thread = json.loads(session.query(Thread).filter((Thread.thread == id) and (Thread.is_deleted == False)).first().to_json())
+                    thread = json.loads(session.query(Thread).filter(Thread.thread == id, Thread.is_deleted == False).first().to_json())
             except:
-                thread = json.loads(session.query(Thread).filter((Thread.thread == id) and (Thread.is_deleted == False)).first().to_json())
+                thread = json.loads(session.query(Thread).filter(Thread.thread == id, Thread.is_deleted == False).first().to_json())
             print(thread)
             print(postsList)
             if postsList and thread:
@@ -257,7 +264,7 @@ def knownThread(id):
             try:
                 session = DBSession()
                 thread = json.loads(session.query(Thread).filter(
-                    (Thread.thread == id) and (Thread.is_deleted == False)).first().to_json())
+                    Thread.thread == id, Thread.is_deleted == False).first().to_json())
                 if thread:
                     if not thread['is_closed']:
                         print(recv_data['data'])
@@ -292,12 +299,12 @@ def knownThread(id):
                         session.add(reply)
                         session.commit()
                         posts = session.query(Post).filter(
-                            (Post.thread == id) and (Post.is_deleted == False)).all()
+                            Post.thread == id, Post.is_deleted == False).all()
                         postsList = []
                         for i in posts:
                             postsList.append(json.loads(i.to_json()))
                         thread = json.loads(session.query(Thread).filter(
-                            (Thread.thread == id) and (Thread.is_deleted == False)).first().to_json())
+                            Thread.thread == id, Thread.is_deleted == False).first().to_json())
                         session.close()
                         return {'code': 200, 'data': {"thread": thread, "posts": postsList}}
                     else:

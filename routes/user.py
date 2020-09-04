@@ -14,7 +14,7 @@ route = Blueprint('user', __name__)
 
 @route.route('/login', methods=['POST'])
 def loginRoute():
-    recv_data = json.loads(request.get_data('data'))
+    recv_data = json.loads(request.get_data('data', parse_form_data=True))
     try:
         user = User.query.filter_by(username=recv_data['username']).first()
         if user and bcrypt.checkpw(recv_data['password'].encode('utf-8'), user.password_hash.encode('utf-8')):
@@ -44,7 +44,7 @@ def loginRoute():
 
 @route.route('/register', methods=['POST'])
 def registerRoute():
-    recv_data = json.loads(request.get_data('data'))
+    recv_data = json.loads(request.get_data('data', parse_form_data=True))
     try:
         existingUsers = shared.db.session.query(User).filter(User.username == recv_data['username']).all()
         if existingUsers:
@@ -97,7 +97,7 @@ def needLogin(block=True):
                         'code': 401,
                         'data': {},
                         'toast': [
-                            {'code': 401, 'message': 'You are not authourized.', 'identifier': 'message.notAuthorized'}]
+                            {'code': 401, 'message': 'You are not authorized.', 'identifier': 'message.notAuthorized'}]
                     }
             request.user_logged = user is not None
             result = f(*args, **kwargs)
