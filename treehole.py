@@ -201,8 +201,24 @@ def unknownThread():
                     {'code': 500, 'message': 'Internal Server Error', 'identifier': 'message.ise'}]
                 return {'code': 500, 'data': {}, 'toast': toastsList}
         elif recv_data['action'] == "query":
-            if recv_data['data']['type'] == "thread":
-                pass
+            session = DBSession()
+            for query_entry in recv_data['data']:
+                if not query_entry['count']:
+                    query_entry.update({"count": 100})
+                if query_entry['type'] == "by_thread_id":
+                    resultList = []
+                    if request.user_logged:
+                        if checkPermission(request.user_group, "GET_DELETED"):
+                            resultList = session.query(Thread).filter(Thread.thread.like(query_entry['thread_id'])).all()
+                        else:
+                            resultList = session.query(Thread).filter(Thread.thread.like(query_entry['thread_id']), Thread.is_deleted == False).all()
+                    else:
+                        resultList = session.query(Thread).filter(Thread.thread.like(query_entry['thread_id']), Thread.is_deleted == False).all()
+                    entryList = []
+                    for i in resultList:
+                        entryList.append(json.loads(i.to_json()))
+                    session.close()
+                    return {'code': 200, 'data': entryList}
     except Exception as err:
         print(err)
         toastsList = [

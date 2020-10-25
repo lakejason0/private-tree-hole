@@ -50,7 +50,9 @@ def registerRoute():
         if existingUsers:
             return {
                 'code': 400,
-                'data': [],
+                'data': {
+                    'success': False
+                },
                 'toast': [
                     {'code': 400, 'message': 'The requested username is occupied',
                      'identifier': 'message.usernameBeingOccupied'}
